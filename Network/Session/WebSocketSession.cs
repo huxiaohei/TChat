@@ -1,0 +1,120 @@
+/*****************************************************************
+ * Description 
+ * Email huxiaoheigame@gmail.com
+ * Created on 2024/11/23 11:29:31
+ * Copyright (c) 2023 虎小黑
+ ****************************************************************/
+
+using TChat.Utils.Log;
+using TChat.Utils.Sequence;
+using System.Net.WebSockets;
+using TChat.Network.Message;
+using System.Threading.Channels;
+using TChat.Abstractions.Network;
+
+namespace TChat.Network.Session
+{
+    public class WebSocketSession : ISession
+    {
+        public long SessionId { get; } = 0;
+        public long RoleId { get; set; } = 0;
+        private ISessionManager _sessionManager;
+        private WebSocket _webSocket;
+
+        public WebSocketSession(ISessionManager sessionManager, WebSocket webSocket)
+        {
+            _sessionManager = sessionManager;
+            _webSocket = webSocket;
+            SessionId = MemoryUniqueSequence.Next();
+        }
+
+        public bool IsConnected
+        {
+            get => _webSocket.State == WebSocketState.Open;
+        }
+
+        public async Task SendMessageAsync(byte[] data)
+        {
+            await _webSocket.SendAsync(data, WebSocketMessageType.Binary, true, CancellationToken.None);
+        }
+
+        public async Task SendMessageAsync(SCMessage message)
+        {
+            await SendMessageAsync(message.Encode());
+            Loggers.Network.Info($"Send message to RoleId:{RoleId} MsgName:{message.MsgName} ClientSerialId:{message.ClientSerialId} ServerSerialId:{message.ServerSerialId} Message:{message.Message}");
+        }
+
+        public async Task Close()
+        {
+            if (!IsConnected)
+                return;
+            await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+        }
+
+        public async Task ReceiveMessageAsync(ChannelWriter<CSMessage> writer)
+        {
+            using var buffer = new RentBuffer(1024 * 8);
+            var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            try
+            {
+                WebSocketReceiveResult receiveResult;
+                while (IsConnected)
+                {
+                    do
+                    {
+                        receiveResult = await _webSocket.ReceiveAsync(buffer.Buffer, cancellationToken.Token);
+                    } while (!receiveResult.EndOfMessage);
+                    if (receiveResult.CloseStatus.HasValue)
+                    {
+                        Loggers.Network.Info($"SessionId:{SessionId} receive message close status:{receiveResult.CloseStatus}");
+                        break;
+                    }
+                    if (receiveResult.Count > 0)
+                    {
+                        var msg = CSMessage.Decode(buffer.Buffer[..receiveResult.Count].ToArray());
+                        Loggers.Network.Info($"Receive message from RoleId:{msg.RoleId} MsgName:{msg.MsgName} ClientSerialId:{msg.ClientSerialId} ServerSerialId:{msg.ServerSerialId} Message:{msg.Message}");
+                        writer.TryWrite(msg);
+                    }
+                }
+            }
+            catch (OperationCanceledException e)
+            {
+                Loggers.Network.Info($"SessionId:{SessionId} receive message timeout error:{e}");
+            }
+            catch (Exception e)
+            {
+                Loggers.Network.Error($"SessionId:{SessionId} receive message error:{e}");
+            }
+            finally
+            {
+                await Close();
+                _sessionManager.RemoveSession(SessionId);
+            }
+        }
+
+        public async Task ProcessMessageAsync(ChannelReader<CSMessage> reader)
+        {
+            try
+            {
+                var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+                while (IsConnected || reader.Count > 0)
+                {
+                    var msg = await reader.ReadAsync(cancellationToken.Token);
+                    if (msg == null)
+                    {
+                        cancellationToken.TryReset();
+                        continue;
+                    }
+                    // TODO: Process message
+                    await SendMessageAsync(new SCMessage(msg.ClientSerialId, 0, msg.Message));
+                }
+            }
+            catch (Exception e)
+            {
+                Loggers.Network.Error($"SessionId:{SessionId} process message error:{e}");
+            }
+        }
+
+
+    }
+}

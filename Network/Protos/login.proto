@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package TChat.Network.Protos;
+
+message CSLoginReq {
+  int64 uid = 1;
+  int64 server_id = 2;
+  string token = 3;
+}
+
+message CSReLoginReq {
+  int64 uid = 1;
+  int64 role_id = 2;
+  int64 server_id = 3;
+  string token = 4;
+}
