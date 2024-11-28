@@ -21,7 +21,7 @@ namespace TChat.ChatServer.Grains
             SiloAddress = localSiloDetails.SiloAddress;
         }
 
-        public Task SendMessageAsync(SiloAddress siloAddress, long sessionId, IBaseMessage message)
+        public Task SendMessageAsync(SiloAddress siloAddress, long sessionId, ICSMessage message)
         {
             throw new NotImplementedException();
         }

@@ -25,7 +25,6 @@ namespace TChat.ChatServer.Extensions
     {
         public static void AddDefaultServices(this ServerBuilder builder)
         {
-
         }
 
         public static void AddNLog(this ServerBuilder builder)
@@ -42,7 +41,7 @@ namespace TChat.ChatServer.Extensions
                 builder.AddNLog();
             });
 
-            Loggers.Chat.Info("NLog is ready.");
+            Loggers.Network.Info("AddNLog NLog is ready.");
         }
 
         public static bool TryListenTcp(this ServerBuilder builder)
@@ -93,7 +92,9 @@ namespace TChat.ChatServer.Extensions
             await siloHost.StartAsync();
             var silo = siloHost.Services.GetRequiredService<Silo>();
             var clusterClient = siloHost.Services.GetRequiredService<IClusterClient>();
-            // TODO: 将silo和clusterClient注册到MessageHandler中
+
+            builder.Builder.Services.AddSingleton(silo.SiloAddress);
+            builder.Builder.Services.AddSingleton(clusterClient);
         }
 
     }

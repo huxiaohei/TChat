@@ -14,7 +14,7 @@ namespace TChat.Abstractions.Grains
     {
         SiloAddress SiloAddress { get; }
         IServiceProvider Provider { get; }
-        Task SendMessageAsync(SiloAddress siloAddress, long sessionId, IBaseMessage message);
+        Task SendMessageAsync(SiloAddress siloAddress, long sessionId, ICSMessage message);
         Task CloseSessionAsync(SiloAddress siloAddress, long sessionId);
     }
 

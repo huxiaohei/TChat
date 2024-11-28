@@ -1,5 +1,6 @@
 
 using TChat.ChatServer.Extensions;
+using TChat.ChatServer.Message;
 using TChat.Network;
 
 namespace ChatServer
@@ -18,6 +19,8 @@ namespace ChatServer
             server.TryListenTcp();
 
             server.StartGrainServerAsync();
+
+            server.RegisterMessageHandler<ChatMessageHandler>();
 
             server.Run();
         }

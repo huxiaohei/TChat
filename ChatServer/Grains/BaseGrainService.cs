@@ -24,7 +24,7 @@ namespace TChat.ChatServer.Grains
             SessionManager = sessionManager;
         }
 
-        public Task SendMessageAsync(long sessionId, IBaseMessage message)
+        public Task SendMessageAsync(long sessionId, ISCMessage message)
         {
             throw new NotImplementedException();
         }

@@ -1,14 +1,14 @@
 /*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
- * Created on 2024/11/27 15:04:36
+ * Created on 2024/11/28 17:40:01
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
 namespace TChat.Abstractions.Message
 {
-    public interface IBaseMessage
+    public interface IMessageHandler
     {
-        public byte[] Encode();
+        Task<ISCMessage?> HandleMessage(long sessionId, ICSMessage message);
     }
 }

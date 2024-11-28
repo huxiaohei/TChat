@@ -15,7 +15,7 @@ namespace TChat.Network.Message
 {
     [Immutable]
     [GenerateSerializer]
-    public class CSMessage : IBaseMessage
+    public class CSMessage : ICSMessage
     {
         [Id(0)]
         public long RoleId { get; }

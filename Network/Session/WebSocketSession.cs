@@ -11,6 +11,7 @@ using System.Net.WebSockets;
 using TChat.Network.Message;
 using System.Threading.Channels;
 using TChat.Abstractions.Network;
+using TChat.Abstractions.Message;
 
 namespace TChat.Network.Session
 {
@@ -20,10 +21,12 @@ namespace TChat.Network.Session
         public long RoleId { get; set; } = 0;
         private ISessionManager _sessionManager;
         private WebSocket _webSocket;
+        private IMessageHandler _handler;
 
-        public WebSocketSession(ISessionManager sessionManager, WebSocket webSocket)
+        public WebSocketSession(ISessionManager sessionManager, IMessageHandler handler, WebSocket webSocket)
         {
             _sessionManager = sessionManager;
+            _handler = handler;
             _webSocket = webSocket;
             SessionId = MemoryUniqueSequence.Next();
         }
@@ -51,7 +54,7 @@ namespace TChat.Network.Session
             await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
         }
 
-        public async Task ReceiveMessageAsync(ChannelWriter<CSMessage> writer)
+        public async Task ReceiveMessageAsync(ChannelWriter<ICSMessage> writer)
         {
             using var buffer = new RentBuffer(1024 * 8);
             var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(30));
@@ -92,7 +95,7 @@ namespace TChat.Network.Session
             }
         }
 
-        public async Task ProcessMessageAsync(ChannelReader<CSMessage> reader)
+        public async Task ProcessMessageAsync(ChannelReader<ICSMessage> reader)
         {
             try
             {
@@ -105,8 +108,18 @@ namespace TChat.Network.Session
                         cancellationToken.TryReset();
                         continue;
                     }
-                    // TODO: Process message
-                    await SendMessageAsync(new SCMessage(msg.ClientSerialId, 0, msg.Message));
+                    try
+                    {
+                        var resp = await _handler.HandleMessage(SessionId, msg);
+                        if (resp != null)
+                        {
+                            await SendMessageAsync(new SCMessage(msg.ClientSerialId, resp.ServerSerialId, resp.Message));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Loggers.Network.Error($"Process Message:{msg} Error:{e}");
+                    }
                 }
             }
             catch (Exception e)

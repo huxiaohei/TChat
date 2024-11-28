@@ -9,6 +9,7 @@ using Tchat.Network.Session;
 using TChat.Abstractions.Network;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using TChat.Abstractions.Message;
 
 namespace TChat.Network
 {
@@ -23,6 +24,11 @@ namespace TChat.Network
             Builder.Services.AddOptions();
             Builder.Services.AddLogging();
             Builder.Services.AddSingleton<ISessionManager, SessionManager>();
+        }
+
+        public void RegisterMessageHandler<T>() where T : class, IMessageHandler
+        {
+            Builder.Services.AddSingleton<IMessageHandler, T>();
         }
 
         public void Run()

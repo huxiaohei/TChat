@@ -1,18 +1,17 @@
 /*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
- * Created on 2024/11/27 14:59:55
+ * Created on 2024/11/28 18:09:58
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using Orleans.Services;
 using TChat.Abstractions.Message;
 
 namespace TChat.Abstractions.Grains
 {
-    public interface IBaseGrainService : IGrainService
+    public interface IPlayerGrain : IGrainWithIntegerKey
     {
-        Task SendMessageAsync(long sessionId, ISCMessage message);
-        Task CloseSessionAsync(long sessionId);
+        Task<ISCMessage?> ProcessMessage(SiloAddress siloAddress, long sessionId, ICSMessage message);
     }
+
 }

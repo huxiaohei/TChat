@@ -15,7 +15,7 @@ namespace TChat.Network.Message
 {
     [Immutable]
     [GenerateSerializer]
-    public class SCMessage : IBaseMessage
+    public class SCMessage : ISCMessage
     {
         [Id(0)]
         public string MsgName { get; }
