@@ -1,6 +1,6 @@
-using NLog;
+
+using TChat.ChatServer.Extensions;
 using TChat.Network;
-using TChat.Utils.Log;
 
 namespace ChatServer
 {
@@ -9,11 +9,17 @@ namespace ChatServer
     {
         static void Main(string[] args)
         {
-            Loggers.InitNLog();
-
             var server = new ServerBuilder();
+
+            server.AddDefaultServices();
+
+            server.AddNLog();
+
             server.TryListenTcp();
-            server.StartGrainServerAsync(true);
+
+            server.StartGrainServerAsync();
+
+            server.Run();
         }
     }
 }

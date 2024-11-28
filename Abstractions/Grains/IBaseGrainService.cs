@@ -10,9 +10,9 @@ using TChat.Abstractions.Message;
 
 namespace TChat.Abstractions.Grains
 {
-    public interface IGrainBaseService : IGrainService
+    public interface IBaseGrainService : IGrainService
     {
-        Task SendMessageAsync(long roleId, IBaseMessage message);
+        Task SendMessageAsync(long sessionId, IBaseMessage message);
         Task CloseSessionAsync(long sessionId);
     }
 }

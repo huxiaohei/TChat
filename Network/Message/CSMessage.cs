@@ -9,12 +9,13 @@ using System.Buffers;
 using System.Text;
 using Google.Protobuf;
 using TChat.Network.Extensions;
+using TChat.Abstractions.Message;
 
 namespace TChat.Network.Message
 {
     [Immutable]
     [GenerateSerializer]
-    public class CSMessage
+    public class CSMessage : IBaseMessage
     {
         [Id(0)]
         public long RoleId { get; }

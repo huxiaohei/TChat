@@ -5,16 +5,17 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using System.Buffers;
 using System.Text;
+using System.Buffers;
 using Google.Protobuf;
 using TChat.Network.Extensions;
+using TChat.Abstractions.Message;
 
 namespace TChat.Network.Message
 {
     [Immutable]
     [GenerateSerializer]
-    public class SCMessage
+    public class SCMessage : IBaseMessage
     {
         [Id(0)]
         public string MsgName { get; }
