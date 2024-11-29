@@ -60,7 +60,7 @@ namespace TChat.ChatServer.Extensions
             return false;
         }
 
-        public static async void StartGrainServerAsync(this ServerBuilder builder)
+        public static async Task StartGrainServerAsync(this ServerBuilder builder)
         {
             var siloHostBuild = new HostBuilder()
                 .UseOrleans(silo =>
@@ -68,9 +68,9 @@ namespace TChat.ChatServer.Extensions
                     silo.AddGrainService<BaseGrainService>()
                         .ConfigureServices(services =>
                         {
-                            services.AddSingleton<IBaseGrainServiceClient, BaseGrainServiceClient>();
                             services.AddSingleton(builder.Builder.Services.BuildServiceProvider().GetRequiredService<ISessionManager>());
                             services.AddSingleton(builder.Builder.Services.BuildServiceProvider().GetRequiredService<ILoggerFactory>());
+                            services.AddSingleton<IBaseGrainServiceClient, BaseGrainServiceClient>();
                         })
                         .UseDashboard();
                     silo.Configure<ClusterOptions>(options =>
@@ -87,12 +87,12 @@ namespace TChat.ChatServer.Extensions
                         silo.UseLocalhostClustering();
                         silo.UseInMemoryReminderService();
                     }
-                }).UseConsoleLifetime();
+                });
             var siloHost = siloHostBuild.Build();
             await siloHost.StartAsync();
+
             var silo = siloHost.Services.GetRequiredService<Silo>();
             var clusterClient = siloHost.Services.GetRequiredService<IClusterClient>();
-
             builder.Builder.Services.AddSingleton(silo.SiloAddress);
             builder.Builder.Services.AddSingleton(clusterClient);
         }

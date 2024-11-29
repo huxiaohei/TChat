@@ -8,7 +8,7 @@ namespace ChatServer
 
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var server = new ServerBuilder();
 
@@ -18,7 +18,7 @@ namespace ChatServer
 
             server.TryListenTcp();
 
-            server.StartGrainServerAsync();
+            // await server.StartGrainServerAsync();
 
             server.RegisterMessageHandler<ChatMessageHandler>();
 

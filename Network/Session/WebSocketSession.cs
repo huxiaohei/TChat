@@ -80,9 +80,9 @@ namespace TChat.Network.Session
                     }
                 }
             }
-            catch (OperationCanceledException e)
+            catch (OperationCanceledException)
             {
-                Loggers.Network.Info($"SessionId:{SessionId} receive message timeout error:{e}");
+                Loggers.Network.Info($"SessionId:{SessionId} receive message timeout");
             }
             catch (Exception e)
             {
