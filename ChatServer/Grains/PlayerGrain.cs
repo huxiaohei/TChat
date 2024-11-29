@@ -8,6 +8,8 @@
 using TChat.Utils.Log;
 using TChat.Abstractions.Grains;
 using TChat.Abstractions.Message;
+using Google.Protobuf;
+using TChat.Network.Message;
 
 namespace TChat.ChatServer.Grains
 {
@@ -15,11 +17,15 @@ namespace TChat.ChatServer.Grains
     public class PlayerGrain : Grain, IPlayerGrain
     {
         public readonly long RoleId;
+        public readonly IBaseGrainServiceClient ServiceClient;
+        private SiloAddress? SessionSiloAddress;
+        private long SessionId;
 
-        public PlayerGrain(IGrainContext grainContext, IGrainRuntime grainRuntime)
+        public PlayerGrain(IGrainContext grainContext, IGrainRuntime grainRuntime, IBaseGrainServiceClient serviceClient)
             : base(grainContext, grainRuntime)
         {
             RoleId = this.GetPrimaryKeyLong();
+            ServiceClient = serviceClient;
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
@@ -31,6 +37,7 @@ namespace TChat.ChatServer.Grains
         public Task<ISCMessage?> ProcessMessage(SiloAddress siloAddress, long sessionId, ICSMessage message)
         {
             Loggers.Player.Info($"PlayerGrain {RoleId} received message {message}");
+            ServiceClient.SendMessageAsync(siloAddress, sessionId, new SCMessage(0, 0, message.Message));
             return Task.FromResult<ISCMessage?>(null);
         }
     }

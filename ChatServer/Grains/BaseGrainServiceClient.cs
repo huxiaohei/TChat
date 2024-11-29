@@ -5,30 +5,32 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
+using Orleans.Runtime.Services;
 using TChat.Abstractions.Grains;
 using TChat.Abstractions.Message;
 
 namespace TChat.ChatServer.Grains
 {
-    public class BaseGrainServiceClient : IBaseGrainServiceClient
+    public class BaseGrainServiceClient : GrainServiceClient<IBaseGrainService>, IBaseGrainServiceClient
     {
         public IServiceProvider Provider { get; }
         public SiloAddress SiloAddress { get; }
 
         public BaseGrainServiceClient(IServiceProvider provider, ILocalSiloDetails localSiloDetails)
+            : base(provider)
         {
             Provider = provider;
             SiloAddress = localSiloDetails.SiloAddress;
         }
 
-        public Task SendMessageAsync(SiloAddress siloAddress, long sessionId, ICSMessage message)
+        public async Task SendMessageAsync(SiloAddress siloAddress, long sessionId, ISCMessage message)
         {
-            throw new NotImplementedException();
+            await GetGrainService(siloAddress).SendMessageAsync(sessionId, message);
         }
 
-        public Task CloseSessionAsync(SiloAddress siloAddress, long sessionId)
+        public async Task CloseSessionAsync(SiloAddress siloAddress, long sessionId)
         {
-            throw new NotImplementedException();
+            await GetGrainService(siloAddress).CloseSessionAsync(sessionId);
         }
     }
 }

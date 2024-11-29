@@ -41,13 +41,13 @@ namespace TChat.Network.Session
             await _webSocket.SendAsync(data, WebSocketMessageType.Binary, true, CancellationToken.None);
         }
 
-        public async Task SendMessageAsync(SCMessage message)
+        public async Task SendMessageAsync(ISCMessage message)
         {
             await SendMessageAsync(message.Encode());
             Loggers.Network.Info($"Send message to RoleId:{RoleId} MsgName:{message.MsgName} ClientSerialId:{message.ClientSerialId} ServerSerialId:{message.ServerSerialId} Message:{message.Message}");
         }
 
-        public async Task Close()
+        public async Task CloseAsync()
         {
             if (!IsConnected)
                 return;
@@ -90,7 +90,7 @@ namespace TChat.Network.Session
             }
             finally
             {
-                await Close();
+                await CloseAsync();
                 _sessionManager.RemoveSession(SessionId);
             }
         }

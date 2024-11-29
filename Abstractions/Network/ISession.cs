@@ -5,12 +5,15 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
+using TChat.Abstractions.Message;
+
 namespace TChat.Abstractions.Network
 {
     public interface ISession
     {
         long SessionId { get; }
         Task SendMessageAsync(byte[] data);
-        Task Close();
+        Task SendMessageAsync(ISCMessage data);
+        Task CloseAsync();
     }
 }

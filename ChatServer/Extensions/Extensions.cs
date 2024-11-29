@@ -9,6 +9,8 @@ using TChat.Network;
 using TChat.Utils.Envs;
 using System.Diagnostics;
 using NLog.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Configuration;
 using NLog;
 using TChat.Utils.Log;
@@ -62,7 +64,7 @@ namespace TChat.ChatServer.Extensions
 
         public static async Task StartGrainServerAsync(this ServerBuilder builder)
         {
-            var siloHostBuild = new HostBuilder()
+            var siloHostBuild = Host.CreateDefaultBuilder()
                 .UseOrleans(silo =>
                 {
                     silo.AddGrainService<BaseGrainService>()
@@ -84,7 +86,10 @@ namespace TChat.ChatServer.Extensions
                     }
                     else
                     {
-                        silo.UseLocalhostClustering();
+                        silo.UseLocalhostClustering().ConfigureLogging(logging =>
+                        {
+                            logging.AddNLog();
+                        });
                         silo.UseInMemoryReminderService();
                     }
                 });

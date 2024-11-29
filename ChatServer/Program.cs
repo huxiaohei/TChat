@@ -18,7 +18,7 @@ namespace ChatServer
 
             server.TryListenTcp();
 
-            // await server.StartGrainServerAsync();
+            await server.StartGrainServerAsync();
 
             server.RegisterMessageHandler<ChatMessageHandler>();
 

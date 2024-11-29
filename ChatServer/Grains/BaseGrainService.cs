@@ -16,23 +16,33 @@ namespace TChat.ChatServer.Grains
     [Reentrant]
     public class BaseGrainService : GrainService, IBaseGrainService
     {
-        private ISessionManager SessionManager { get; }
+        private ISessionManager _sessionManager { get; }
 
         public BaseGrainService(GrainId grainId, Silo silo, ILoggerFactory loggerFactory, ISessionManager sessionManager)
             : base(grainId, silo, loggerFactory)
         {
-            SessionManager = sessionManager;
+            _sessionManager = sessionManager;
         }
 
         public Task SendMessageAsync(long sessionId, ISCMessage message)
         {
-            throw new NotImplementedException();
+            var session = _sessionManager.GetSession(sessionId);
+            if (session != null)
+            {
+                return session.SendMessageAsync(message);
+            }
+            return Task.CompletedTask;
         }
 
-        public Task CloseSessionAsync(long sessionId)
+        public async Task CloseSessionAsync(long sessionId)
         {
-            throw new NotImplementedException();
+            var session = _sessionManager.GetSession(sessionId);
+            if (session != null)
+            {
+                await session.CloseAsync();
+                _sessionManager.RemoveSession(sessionId);
+            }
         }
-    }
 
+    }
 }

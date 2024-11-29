@@ -12,7 +12,7 @@ namespace TChat.Abstractions.Grains
 {
     public interface IBaseGrainService : IGrainService
     {
-        Task SendMessageAsync(long sessionId, ISCMessage message);
+        Task SendMessageAsync(long sessionId, [Immutable] ISCMessage message);
         Task CloseSessionAsync(long sessionId);
     }
 }

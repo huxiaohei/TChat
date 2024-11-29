@@ -12,10 +12,11 @@ namespace TChat.Abstractions.Grains
 {
     public interface IBaseGrainServiceClient : IGrainServiceClient<IGrainService>
     {
-        SiloAddress SiloAddress { get; }
         IServiceProvider Provider { get; }
-        Task SendMessageAsync(SiloAddress siloAddress, long sessionId, ICSMessage message);
-        Task CloseSessionAsync(SiloAddress siloAddress, long sessionId);
+        SiloAddress SiloAddress { get; }
+
+        Task SendMessageAsync([Immutable] SiloAddress siloAddress, long sessionId, [Immutable] ISCMessage message);
+        Task CloseSessionAsync([Immutable] SiloAddress siloAddress, long sessionId);
     }
 
 }

@@ -9,14 +9,19 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.3" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
     <PackageReference Include="Microsoft.Orleans.Client" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Orleans.Reminders.AdoNet" Version="9.0.1" />
     <PackageReference Include="Microsoft.Orleans.Sdk" Version="9.0.1" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="9.0.1" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.15" />
+    <PackageReference Include="OrleansDashboard" Version="8.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Abstractions\Abstractions.csproj" />
     <ProjectReference Include="..\Network\Network.csproj" />
     <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>

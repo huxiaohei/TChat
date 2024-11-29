@@ -10,12 +10,11 @@ using TChat.Abstractions.Message;
 
 namespace TChat.ChatServer.Message
 {
-    public class ChatMessageHandler : IMessageHandler
+    public class ChatMessageHandler(SiloAddress siloAddress, IClusterClient clusterClient) : IMessageHandler
     {
         public async Task<ISCMessage?> HandleMessage(long sessionId, ICSMessage message)
         {
-            // return await clusterClient.GetGrain<IPlayerGrain>(message.RoleId).ProcessMessage(siloAddress, sessionId, message);
-            return default;
+            return await clusterClient.GetGrain<IPlayerGrain>(message.RoleId).ProcessMessage(siloAddress, sessionId, message);
         }
     }
 

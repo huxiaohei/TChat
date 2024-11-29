@@ -11,7 +11,7 @@ namespace TChat.Abstractions.Grains
 {
     public interface IPlayerGrain : IGrainWithIntegerKey
     {
-        Task<ISCMessage?> ProcessMessage(SiloAddress siloAddress, long sessionId, ICSMessage message);
+        Task<ISCMessage?> ProcessMessage([Immutable] SiloAddress siloAddress, long sessionId, [Immutable] ICSMessage message);
     }
 
 }
