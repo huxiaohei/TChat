@@ -5,20 +5,19 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
+using NLog;
 using TChat.Network;
+using TChat.Utils.Log;
 using TChat.Utils.Envs;
 using System.Diagnostics;
-using NLog.Extensions.Logging;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Configuration;
-using NLog;
-using TChat.Utils.Log;
+using Orleans.Configuration;
 using TChat.ChatServer.Grains;
+using NLog.Extensions.Logging;
 using TChat.Abstractions.Grains;
 using TChat.Abstractions.Network;
-using Orleans.Configuration;
-using System.Net;
+using TChat.Abstractions.Message;
+using Microsoft.Extensions.Logging.Configuration;
+
 
 namespace TChat.ChatServer.Extensions
 {
@@ -36,26 +35,23 @@ namespace TChat.ChatServer.Extensions
             filePath = $"{filePath}/{name}";
             LogManager.LogFactory.Setup().LoadConfigurationFromFile(filePath);
 
-            builder.Builder.Services.AddLogging(builder =>
+            builder.AddLogging(builder =>
             {
                 builder.ClearProviders();
                 builder.AddConfiguration();
                 builder.AddNLog();
             });
 
-            Loggers.Network.Info("AddNLog NLog is ready.");
+            Loggers.Chat.Info("AddNLog NLog is ready.");
         }
 
         public static bool TryListenTcp(this ServerBuilder builder)
         {
             if (EnvUtils.TryGetEnv("TcpPort", out var tcpPort))
             {
-                builder.Builder.WebHost.ConfigureKestrel((context, kesterl) =>
+                builder.ListenTcp(int.Parse(tcpPort), options =>
                 {
-                    kesterl.Listen(IPAddress.IPv6Any, int.Parse(tcpPort), options =>
-                    {
-                        // options.UseConnectionHandler<TcpConnectionHandler>();
-                    });
+                    // options.UseConnectionHandler();
                 });
                 return true;
             }
@@ -70,8 +66,8 @@ namespace TChat.ChatServer.Extensions
                     silo.AddGrainService<BaseGrainService>()
                         .ConfigureServices(services =>
                         {
-                            services.AddSingleton(builder.Builder.Services.BuildServiceProvider().GetRequiredService<ISessionManager>());
-                            services.AddSingleton(builder.Builder.Services.BuildServiceProvider().GetRequiredService<ILoggerFactory>());
+                            services.AddSingleton(builder.App.Services.GetRequiredService<ISessionManager>());
+                            services.AddSingleton(builder.App.Services.GetRequiredService<ILoggerFactory>());
                             services.AddSingleton<IBaseGrainServiceClient, BaseGrainServiceClient>();
                         })
                         .UseDashboard();
@@ -98,8 +94,8 @@ namespace TChat.ChatServer.Extensions
 
             var silo = siloHost.Services.GetRequiredService<Silo>();
             var clusterClient = siloHost.Services.GetRequiredService<IClusterClient>();
-            builder.Builder.Services.AddSingleton(silo.SiloAddress);
-            builder.Builder.Services.AddSingleton(clusterClient);
+            var messageHandler = builder.App.Services.GetRequiredService<IMessageHandler>();
+            messageHandler.Bind(clusterClient, silo.SiloAddress);
         }
 
     }

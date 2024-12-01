@@ -34,11 +34,11 @@ namespace TChat.ChatServer.Grains
             await base.OnActivateAsync(cancellationToken);
         }
 
-        public Task<ISCMessage?> ProcessMessage(SiloAddress siloAddress, long sessionId, ICSMessage message)
+        public async Task<ISCMessage?> ProcessMessage(SiloAddress siloAddress, long sessionId, ICSMessage message)
         {
             Loggers.Player.Info($"PlayerGrain {RoleId} received message {message}");
-            ServiceClient.SendMessageAsync(siloAddress, sessionId, new SCMessage(0, 0, message.Message));
-            return Task.FromResult<ISCMessage?>(null);
+            await ServiceClient.SendMessageAsync(siloAddress, sessionId, new SCMessage(0, 0, message.Message));
+            return default;
         }
     }
 

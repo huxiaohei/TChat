@@ -5,40 +5,69 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
+using System.Net;
 using Tchat.Network.Session;
 using TChat.Abstractions.Network;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using TChat.Abstractions.Message;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace TChat.Network
 {
     public class ServerBuilder
     {
-        public WebApplicationBuilder Builder { get; }
-        public WebApplication? App { get; private set; }
+        private WebApplicationBuilder _builder;
+        public WebApplication? _app { get; private set; }
+
+        public WebApplication App
+        {
+            get
+            {
+                if (_app == null)
+                {
+                    throw new Exception("Server is not built");
+                }
+                return _app;
+            }
+            private set
+            {
+                _app = value;
+            }
+        }
 
         public ServerBuilder()
         {
-            Builder = WebApplication.CreateBuilder();
-            Builder.Services.AddOptions();
-            Builder.Services.AddLogging();
-            Builder.Services.AddSingleton<ISessionManager, SessionManager>();
+            _builder = WebApplication.CreateBuilder();
+            _builder.Services.AddOptions();
+            _builder.Services.AddLogging();
+            _builder.Services.AddSingleton<ISessionManager, SessionManager>();
+        }
+
+        public void AddLogging(Action<ILoggingBuilder> configure)
+        {
+            _builder.Services.AddLogging(configure);
         }
 
         public void RegisterMessageHandler<T>() where T : class, IMessageHandler
         {
-            Builder.Services.AddSingleton<IMessageHandler, T>();
+            _builder.Services.AddSingleton<IMessageHandler, T>();
         }
 
-        public void Run()
+        public void ListenTcp(int port, Action<ListenOptions> configure)
         {
-            if (App != null)
+            _builder.WebHost.ConfigureKestrel((context, kesterl) =>
             {
-                throw new Exception("Server is already running");
-            }
-            Builder.Services.AddControllers();
-            App = Builder.Build();
+                kesterl.Listen(IPAddress.IPv6Any, port, configure);
+            });
+        }
+
+        public void Build()
+        {
+            _builder.Services.AddControllers();
+            App = _builder.Build();
             App.UseWebSockets(new()
             {
                 KeepAliveInterval = TimeSpan.FromMinutes(1)
@@ -47,16 +76,16 @@ namespace TChat.Network
                 await next(context);
             });
             App.MapControllers();
+        }
+
+        public void Run()
+        {
             App.Run();
         }
 
-        public void Stop()
+        public async void Stop()
         {
-            if (App == null)
-            {
-                return;
-            }
-            App.StopAsync();
+            await App.StopAsync();
         }
     }
 }

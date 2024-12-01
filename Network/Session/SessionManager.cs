@@ -5,14 +5,21 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using System.Collections.Concurrent;
+using TChat.Utils.Log;
 using TChat.Abstractions.Network;
+using System.Collections.Concurrent;
 
 namespace Tchat.Network.Session
 {
     public class SessionManager : ISessionManager
     {
         private readonly ConcurrentDictionary<long, ISession> _sessions = new ConcurrentDictionary<long, ISession>();
+
+
+        public SessionManager()
+        {
+            Loggers.Network.Info("SessionManager is ready.");
+        }
 
         public void AddSession(ISession session)
         {

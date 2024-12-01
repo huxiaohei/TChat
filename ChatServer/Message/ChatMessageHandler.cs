@@ -10,11 +10,45 @@ using TChat.Abstractions.Message;
 
 namespace TChat.ChatServer.Message
 {
-    public class ChatMessageHandler(SiloAddress siloAddress, IClusterClient clusterClient) : IMessageHandler
+    public class ChatMessageHandler() : IMessageHandler
     {
+        private IClusterClient? _clusterClient;
+
+        private SiloAddress? _siloAddress;
+
+        public IClusterClient ClusterClient
+        {
+            get
+            {
+                if (_clusterClient == null)
+                {
+                    throw new InvalidOperationException("ClusterClient is not bound.");
+                }
+                return _clusterClient;
+            }
+        }
+
+        public SiloAddress SiloAddress
+        {
+            get
+            {
+                if (_siloAddress == null)
+                {
+                    throw new InvalidOperationException("SiloAddress is not bound.");
+                }
+                return _siloAddress;
+            }
+        }
+
+        public void Bind(IClusterClient clusterClient, SiloAddress siloAddress)
+        {
+            _clusterClient = clusterClient;
+            _siloAddress = siloAddress;
+        }
+
         public async Task<ISCMessage?> HandleMessage(long sessionId, ICSMessage message)
         {
-            return await clusterClient.GetGrain<IPlayerGrain>(message.RoleId).ProcessMessage(siloAddress, sessionId, message);
+            return await ClusterClient.GetGrain<IPlayerGrain>(message.RoleId).ProcessMessage(SiloAddress, sessionId, message);
         }
     }
 

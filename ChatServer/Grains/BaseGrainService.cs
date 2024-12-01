@@ -24,14 +24,13 @@ namespace TChat.ChatServer.Grains
             _sessionManager = sessionManager;
         }
 
-        public Task SendMessageAsync(long sessionId, ISCMessage message)
+        public async Task SendMessageAsync(long sessionId, ISCMessage message)
         {
             var session = _sessionManager.GetSession(sessionId);
             if (session != null)
             {
-                return session.SendMessageAsync(message);
+                await session.SendMessageAsync(message);
             }
-            return Task.CompletedTask;
         }
 
         public async Task CloseSessionAsync(long sessionId)

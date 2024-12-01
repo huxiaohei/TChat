@@ -12,8 +12,9 @@ namespace TChat.Utils.Log
     public sealed class Loggers
     {
         public static Logger Test = LogManager.GetLogger("Test");
-        public static Logger Player = LogManager.GetLogger("Player");
         public static Logger Network = LogManager.GetLogger("Network");
+        public static Logger Chat = LogManager.GetLogger("Chat");
+        public static Logger Player = LogManager.GetLogger("Player");
 
     }
 }

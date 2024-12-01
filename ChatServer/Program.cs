@@ -1,7 +1,13 @@
+/*****************************************************************
+ * Description 
+ * Email huxiaoheigame@gmail.com
+ * Created on 2024/12/1 13:35:17
+ * Copyright (c) 2023 虎小黑
+ ****************************************************************/
 
-using TChat.ChatServer.Extensions;
-using TChat.ChatServer.Message;
 using TChat.Network;
+using TChat.ChatServer.Message;
+using TChat.ChatServer.Extensions;
 
 namespace ChatServer
 {
@@ -18,9 +24,11 @@ namespace ChatServer
 
             server.TryListenTcp();
 
-            await server.StartGrainServerAsync();
-
             server.RegisterMessageHandler<ChatMessageHandler>();
+
+            server.Build();
+
+            await server.StartGrainServerAsync();
 
             server.Run();
         }
