@@ -5,11 +5,13 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
+using Google.Protobuf;
+
 namespace TChat.Abstractions.Message
 {
     public interface IMessageHandler
     {
         void Bind(IClusterClient clusterClient, SiloAddress siloAddress);
-        Task<ISCMessage?> HandleMessage(long sessionId, ICSMessage message);
+        Task<(uint, IMessage?)> HandleMessage(long sessionId, ICSMessage message);
     }
 }

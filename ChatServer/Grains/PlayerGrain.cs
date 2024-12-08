@@ -6,10 +6,9 @@
  ****************************************************************/
 
 using TChat.Utils.Log;
+using TChat.Network.Message;
 using TChat.Abstractions.Grains;
 using TChat.Abstractions.Message;
-using Google.Protobuf;
-using TChat.Network.Message;
 
 namespace TChat.ChatServer.Grains
 {
@@ -36,6 +35,18 @@ namespace TChat.ChatServer.Grains
 
         public async Task<ISCMessage?> ProcessMessage(SiloAddress siloAddress, long sessionId, ICSMessage message)
         {
+            if (SessionSiloAddress == null)
+            {
+                SessionSiloAddress = siloAddress;
+                SessionId = sessionId;
+            }
+            else
+            {
+                if (siloAddress != SessionSiloAddress || sessionId != SessionId)
+                {
+
+                }
+            }
             Loggers.Player.Info($"PlayerGrain {RoleId} received message {message}");
             await ServiceClient.SendMessageAsync(siloAddress, sessionId, new SCMessage(0, 0, message.Message));
             return default;

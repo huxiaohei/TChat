@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package TChat.Network.Protos;
+
+enum ErrCode
+{
+    ok = 0;
+    invalid_token = 1;
+    first_msg_not_login = 2;
+}
+
+message SCErrResp
+{
+    ErrCode err_code = 1;
+    string err_msg = 2;
+}

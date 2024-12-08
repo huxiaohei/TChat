@@ -99,7 +99,7 @@ namespace TChat.Network.Session
         {
             try
             {
-                var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+                var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(30));
                 while (IsConnected || reader.Count > 0)
                 {
                     var msg = await reader.ReadAsync(cancellationToken.Token);
@@ -110,10 +110,16 @@ namespace TChat.Network.Session
                     }
                     try
                     {
-                        var resp = await _handler.HandleMessage(SessionId, msg);
+
+                        if (RoleId == 0)
+                        {
+                            RoleId = msg.RoleId;
+                        }
+
+                        var (serverSerialId, resp) = await _handler.HandleMessage(SessionId, msg);
                         if (resp != null)
                         {
-                            await SendMessageAsync(new SCMessage(msg.ClientSerialId, resp.ServerSerialId, resp.Message));
+                            await SendMessageAsync(new SCMessage(msg.ClientSerialId, serverSerialId, resp));
                         }
                     }
                     catch (Exception e)
