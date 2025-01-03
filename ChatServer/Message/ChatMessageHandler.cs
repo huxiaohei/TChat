@@ -6,6 +6,7 @@
  ****************************************************************/
 
 using Google.Protobuf;
+using TChat.Abstractions.Grains;
 using TChat.Abstractions.Message;
 
 namespace TChat.ChatServer.Message
@@ -14,8 +15,7 @@ namespace TChat.ChatServer.Message
     {
         override public async Task<(uint, IMessage?)> HandleMessage(long sessionId, ICSMessage message)
         {
-            // return await ClusterClient.GetGrain<IPlayerGrain>(message.RoleId).ProcessMessage(SiloAddress, sessionId, message);
-            return default;
+            return await ClusterClient.GetGrain<IPlayerGrain>(message.RoleId).ProcessMessage(SiloAddress, sessionId, message);
         }
     }
 

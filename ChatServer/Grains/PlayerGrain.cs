@@ -6,6 +6,7 @@
  ****************************************************************/
 
 using TChat.Utils.Log;
+using Google.Protobuf;
 using TChat.Network.Message;
 using TChat.Abstractions.Grains;
 using TChat.Abstractions.Message;
@@ -33,7 +34,7 @@ namespace TChat.ChatServer.Grains
             await base.OnActivateAsync(cancellationToken);
         }
 
-        public async Task<ISCMessage?> ProcessMessage(SiloAddress siloAddress, long sessionId, ICSMessage message)
+        public async Task<(uint, IMessage?)> ProcessMessage(SiloAddress siloAddress, long sessionId, ICSMessage message)
         {
             if (SessionSiloAddress == null)
             {

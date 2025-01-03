@@ -128,6 +128,10 @@ namespace TChat.Network.Session
                     }
                 }
             }
+            catch (OperationCanceledException)
+            {
+                Loggers.Network.Info($"SessionId:{SessionId} process message timeout");
+            }
             catch (Exception e)
             {
                 Loggers.Network.Error($"SessionId:{SessionId} process message error:{e}");

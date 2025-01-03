@@ -5,13 +5,14 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
+using Google.Protobuf;
 using TChat.Abstractions.Message;
 
 namespace TChat.Abstractions.Grains
 {
     public interface IPlayerGrain : IGrainWithIntegerKey
     {
-        Task<ISCMessage?> ProcessMessage([Immutable] SiloAddress siloAddress, long sessionId, [Immutable] ICSMessage message);
+        Task<(uint, IMessage?)> ProcessMessage([Immutable] SiloAddress siloAddress, [Immutable] long sessionId, [Immutable] ICSMessage message);
     }
 
 }

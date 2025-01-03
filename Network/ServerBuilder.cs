@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using TChat.Network.Message;
 
 namespace TChat.Network
 {
@@ -39,7 +38,7 @@ namespace TChat.Network
             }
         }
 
-        public ServerBuilder(Action<CSMessage> action)
+        public ServerBuilder()
         {
             _builder = WebApplication.CreateBuilder();
             _builder.Services.AddOptions();
@@ -53,11 +52,6 @@ namespace TChat.Network
         }
 
         public void RegisterMessageHandler<T>() where T : class, IMessageHandler
-        {
-            _builder.Services.AddSingleton<IMessageHandler, T>();
-        }
-
-        public void FirstMessageHandler<T>() where T : class, IMessageHandler
         {
             _builder.Services.AddSingleton<IMessageHandler, T>();
         }
