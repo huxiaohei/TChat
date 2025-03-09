@@ -1,10 +1,10 @@
-
-using TChat.Utils.Log;
-using TChat.Network.Protos;
+﻿
+using Utils.Log;
+using Network.Protos;
 using System.Net.WebSockets;
-using TChat.Network.Message;
+using Network.Message;
 
-namespace TChat.Tests.Login
+namespace Tests.Login
 {
     public class LoginTest
     {

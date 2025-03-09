@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package TChat.Network.Protos;
+package Network.Protos;
 
 enum ErrCode
 {

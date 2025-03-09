@@ -7,7 +7,7 @@
 
 using NLog;
 
-namespace TChat.Utils.Log
+namespace Utils.Log
 {
     public sealed class Loggers
     {

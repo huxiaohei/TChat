@@ -1,13 +1,13 @@
-/*****************************************************************
+﻿/*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/23 11:04:30
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using TChat.Abstractions.Message;
+using Abstractions.Message;
 
-namespace TChat.Abstractions.Network
+namespace Abstractions.Network
 {
     public interface ISession
     {

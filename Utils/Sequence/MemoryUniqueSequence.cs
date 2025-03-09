@@ -6,7 +6,7 @@
  ****************************************************************/
 
 
-namespace TChat.Utils.Sequence
+namespace Utils.Sequence
 {
     public static class MemoryUniqueSequence
     {

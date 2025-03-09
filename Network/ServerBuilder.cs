@@ -1,4 +1,4 @@
-/*****************************************************************
+﻿/*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/23 14:48:20
@@ -6,16 +6,16 @@
  ****************************************************************/
 
 using System.Net;
-using Tchat.Network.Session;
-using TChat.Abstractions.Network;
-using TChat.Abstractions.Message;
+using Network.Session;
+using Abstractions.Network;
+using Abstractions.Message;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
-namespace TChat.Network
+namespace Network
 {
     public class ServerBuilder
     {

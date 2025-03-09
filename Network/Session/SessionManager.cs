@@ -1,15 +1,15 @@
-/*****************************************************************
+﻿/*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/23 11:42:27
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using TChat.Utils.Log;
-using TChat.Abstractions.Network;
+using Utils.Log;
+using Abstractions.Network;
 using System.Collections.Concurrent;
 
-namespace Tchat.Network.Session
+namespace Network.Session
 {
     public class SessionManager : ISessionManager
     {

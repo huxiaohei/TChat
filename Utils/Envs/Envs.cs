@@ -7,7 +7,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace TChat.Utils.Envs
+namespace Utils.Envs
 {
     public static class EnvUtils
     {

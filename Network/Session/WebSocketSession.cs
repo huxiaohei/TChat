@@ -5,15 +5,15 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using TChat.Utils.Log;
-using TChat.Utils.Sequence;
+using Utils.Log;
+using Utils.Sequence;
 using System.Net.WebSockets;
-using TChat.Network.Message;
+using Network.Message;
 using System.Threading.Channels;
-using TChat.Abstractions.Network;
-using TChat.Abstractions.Message;
+using Abstractions.Network;
+using Abstractions.Message;
 
-namespace TChat.Network.Session
+namespace Network.Session
 {
     public class WebSocketSession : ISession
     {

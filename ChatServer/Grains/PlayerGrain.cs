@@ -1,17 +1,17 @@
-/*****************************************************************
+﻿/*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/28 18:09:37
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using TChat.Utils.Log;
+using Utils.Log;
 using Google.Protobuf;
-using TChat.Network.Message;
-using TChat.Abstractions.Grains;
-using TChat.Abstractions.Message;
+using Network.Message;
+using Abstractions.Grains;
+using Abstractions.Message;
 
-namespace TChat.ChatServer.Grains
+namespace ChatServer.Grains
 {
 
     public class PlayerGrain : Grain, IPlayerGrain

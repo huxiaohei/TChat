@@ -6,10 +6,10 @@
  ****************************************************************/
 
 using Google.Protobuf;
-using TChat.Abstractions.Message;
-using TChat.Network.Protos;
+using Abstractions.Message;
+using Network.Protos;
 
-namespace TChat.ChatServer.Extensions
+namespace ChatServer.Extensions
 {
 
     public static class MessageExtension

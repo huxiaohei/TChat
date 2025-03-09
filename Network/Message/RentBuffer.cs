@@ -1,14 +1,13 @@
-/*****************************************************************
+﻿/*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/23 16:46:18
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using System.Text;
 using System.Buffers;
 
-namespace TChat.Network.Message
+namespace Network.Message
 {
     public struct RentBuffer : IDisposable
     {

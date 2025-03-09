@@ -1,4 +1,4 @@
-/*****************************************************************
+﻿/*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/25 16:10:35
@@ -8,13 +8,14 @@
 using System.Text;
 using System.Buffers;
 using Google.Protobuf;
-using TChat.Network.Extensions;
-using TChat.Abstractions.Message;
+using Network.Extensions;
+using Abstractions.Message;
 
-namespace TChat.Network.Message
+namespace Network.Message
 {
     [Immutable]
     [GenerateSerializer]
+    [Alias("Network.Message.SCMessage")]
     public class SCMessage : ISCMessage
     {
         [Id(0)]

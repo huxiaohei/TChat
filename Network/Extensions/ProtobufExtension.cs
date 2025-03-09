@@ -1,4 +1,4 @@
-/*****************************************************************
+﻿/*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/26 14:51:22
@@ -9,10 +9,9 @@
 using System.Reflection;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
-using TChat.Network.Message;
-using TChat.Utils.Log;
+using Utils.Log;
 
-namespace TChat.Network.Extensions
+namespace Network.Extensions
 {
     public static class ProtobufExtension
     {

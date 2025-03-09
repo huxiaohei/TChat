@@ -1,4 +1,4 @@
-/*****************************************************************
+﻿/*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/28 11:22:35
@@ -6,10 +6,10 @@
  ****************************************************************/
 
 using Orleans.Runtime.Services;
-using TChat.Abstractions.Grains;
-using TChat.Abstractions.Message;
+using Abstractions.Grains;
+using Abstractions.Message;
 
-namespace TChat.ChatServer.Grains
+namespace ChatServer.Grains
 {
     public class BaseGrainServiceClient : GrainServiceClient<IBaseGrainService>, IBaseGrainServiceClient
     {

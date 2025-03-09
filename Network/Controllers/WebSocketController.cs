@@ -1,19 +1,19 @@
-/*****************************************************************
+﻿/*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/23 11:17:09
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using TChat.Utils.Log;
-using TChat.Network.Session;
+using Utils.Log;
+using Network.Session;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Channels;
-using TChat.Abstractions.Message;
-using TChat.Abstractions.Network;
+using Abstractions.Message;
+using Abstractions.Network;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace TChat.Network.Controllers
+namespace Network.Controllers
 {
     public class WebSocketController(IServiceProvider serviceProvider) : ControllerBase
     {

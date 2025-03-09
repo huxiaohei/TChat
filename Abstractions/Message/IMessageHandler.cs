@@ -1,4 +1,4 @@
-/*****************************************************************
+﻿/*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/28 17:40:01
@@ -7,7 +7,7 @@
 
 using Google.Protobuf;
 
-namespace TChat.Abstractions.Message
+namespace Abstractions.Message
 {
     public interface IMessageHandler
     {

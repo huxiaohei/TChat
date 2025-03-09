@@ -1,4 +1,4 @@
-/*****************************************************************
+﻿/*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/28 11:55:46
@@ -6,11 +6,12 @@
  ****************************************************************/
 
 using Orleans.Concurrency;
-using TChat.Abstractions.Grains;
-using TChat.Abstractions.Message;
-using TChat.Abstractions.Network;
+using Abstractions.Grains;
+using Abstractions.Message;
+using Abstractions.Network;
+using Utils.Log;
 
-namespace TChat.ChatServer.Grains
+namespace ChatServer.Grains
 {
 
     [Reentrant]
@@ -31,6 +32,10 @@ namespace TChat.ChatServer.Grains
             {
                 await session.SendMessageAsync(message);
             }
+            else
+            {
+                Loggers.Chat.Info($"Session {sessionId} not found");
+            }
         }
 
         public async Task CloseSessionAsync(long sessionId)
@@ -40,6 +45,10 @@ namespace TChat.ChatServer.Grains
             {
                 await session.CloseAsync();
                 _sessionManager.RemoveSession(sessionId);
+            }
+            else
+            {
+                Loggers.Chat.Info($"Session {sessionId} not found");
             }
         }
 

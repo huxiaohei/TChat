@@ -6,20 +6,20 @@
  ****************************************************************/
 
 using NLog;
-using TChat.Network;
-using TChat.Utils.Log;
-using TChat.Utils.Envs;
+using Network;
+using Utils.Log;
+using Utils.Envs;
 using System.Diagnostics;
 using Orleans.Configuration;
-using TChat.ChatServer.Grains;
+using ChatServer.Grains;
 using NLog.Extensions.Logging;
-using TChat.Abstractions.Grains;
-using TChat.Abstractions.Network;
-using TChat.Abstractions.Message;
+using Abstractions.Grains;
+using Abstractions.Network;
+using Abstractions.Message;
 using Microsoft.Extensions.Logging.Configuration;
 
 
-namespace TChat.ChatServer.Extensions
+namespace ChatServer.Extensions
 {
 
     public static class Extensions
