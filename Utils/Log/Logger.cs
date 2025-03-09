@@ -1,4 +1,4 @@
-/*****************************************************************
+﻿/*****************************************************************
  * Description 
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/23 15:50:47
@@ -11,10 +11,10 @@ namespace Utils.Log
 {
     public sealed class Loggers
     {
-        public static Logger Test = LogManager.GetLogger("Test");
-        public static Logger Network = LogManager.GetLogger("Network");
-        public static Logger Chat = LogManager.GetLogger("Chat");
-        public static Logger Player = LogManager.GetLogger("Player");
+        public static Logger Test { get; } = LogManager.GetLogger("Test");
+        public static Logger Network { get; } = LogManager.GetLogger("Network");
+        public static Logger Chat { get; } = LogManager.GetLogger("Chat");
+        public static Logger Player { get; } = LogManager.GetLogger("Player");
 
     }
 }
