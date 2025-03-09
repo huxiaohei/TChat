@@ -1,5 +1,5 @@
-/*****************************************************************
- * Description 
+﻿/*****************************************************************
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 11/22/2024, 2:27:50 PM
  * Copyright (c) 2023 虎小黑
@@ -11,7 +11,6 @@ namespace Utils.Envs
 {
     public static class EnvUtils
     {
-
         public static bool TryGetEnv(string key, [MaybeNullWhen(false)] out string value)
         {
             var val = Environment.GetEnvironmentVariable(key);

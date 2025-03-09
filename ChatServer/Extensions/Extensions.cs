@@ -1,5 +1,5 @@
-/*****************************************************************
- * Description 
+﻿/*****************************************************************
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/28 15:54:31
  * Copyright (c) 2023 虎小黑
@@ -18,10 +18,8 @@ using Abstractions.Network;
 using Abstractions.Message;
 using Microsoft.Extensions.Logging.Configuration;
 
-
 namespace ChatServer.Extensions
 {
-
     public static class Extensions
     {
         public static void AddDefaultServices(this ServerBuilder builder)
@@ -97,7 +95,5 @@ namespace ChatServer.Extensions
             var messageHandler = builder.App.Services.GetRequiredService<IMessageHandler>();
             messageHandler.Bind(clusterClient, silo.SiloAddress);
         }
-
     }
-
 }

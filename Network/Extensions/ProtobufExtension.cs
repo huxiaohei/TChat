@@ -1,14 +1,14 @@
 ﻿/*****************************************************************
- * Description 
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/26 14:51:22
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-
-using System.Reflection;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
+
+using System.Reflection;
 using Utils.Log;
 
 namespace Network.Extensions
@@ -54,7 +54,6 @@ namespace Network.Extensions
                     if (ass.IsDynamic)
                         continue;
                     LoadParseFromAssembly(ass);
-
                 }
             }
         }

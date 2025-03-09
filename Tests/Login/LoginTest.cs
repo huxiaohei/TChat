@@ -1,15 +1,14 @@
-﻿
-using Utils.Log;
+﻿using Network.Message;
 using Network.Protos;
 using System.Net.WebSockets;
-using Network.Message;
+using Utils.Log;
 
 namespace Tests.Login
 {
     public class LoginTest
     {
         [Fact]
-        public async void TestLogin()
+        public async Task TestLogin()
         {
             var req = new CSMessage(10001, 1, 1, new CSLoginReq()
             {
@@ -34,4 +33,3 @@ namespace Tests.Login
         }
     }
 }
-

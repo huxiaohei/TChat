@@ -1,5 +1,5 @@
 ﻿/*****************************************************************
- * Description 
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/28 11:55:46
  * Copyright (c) 2023 虎小黑
@@ -13,7 +13,6 @@ using Utils.Log;
 
 namespace ChatServer.Grains
 {
-
     [Reentrant]
     public class BaseGrainService : GrainService, IBaseGrainService
     {
@@ -51,6 +50,5 @@ namespace ChatServer.Grains
                 Loggers.Chat.Info($"Session {sessionId} not found");
             }
         }
-
     }
 }

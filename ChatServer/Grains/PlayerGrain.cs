@@ -1,19 +1,18 @@
 ﻿/*****************************************************************
- * Description 
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/28 18:09:37
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using Utils.Log;
-using Google.Protobuf;
-using Network.Message;
 using Abstractions.Grains;
 using Abstractions.Message;
+using Google.Protobuf;
+using Network.Message;
+using Utils.Log;
 
 namespace ChatServer.Grains
 {
-
     public class PlayerGrain : Grain, IPlayerGrain
     {
         public readonly long RoleId;
@@ -45,7 +44,6 @@ namespace ChatServer.Grains
             {
                 if (siloAddress != SessionSiloAddress || sessionId != SessionId)
                 {
-
                 }
             }
             Loggers.Player.Info($"PlayerGrain {RoleId} received message {message}");
@@ -53,5 +51,4 @@ namespace ChatServer.Grains
             return default;
         }
     }
-
 }

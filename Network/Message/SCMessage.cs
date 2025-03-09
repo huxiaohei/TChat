@@ -1,15 +1,15 @@
 ﻿/*****************************************************************
- * Description 
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/25 16:10:35
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using System.Text;
-using System.Buffers;
+using Abstractions.Message;
 using Google.Protobuf;
 using Network.Extensions;
-using Abstractions.Message;
+using System.Buffers;
+using System.Text;
 
 namespace Network.Message
 {
@@ -20,10 +20,13 @@ namespace Network.Message
     {
         [Id(0)]
         public string MsgName { get; }
+
         [Id(1)]
         public uint ClientSerialId { get; }
+
         [Id(2)]
         public uint ServerSerialId { get; }
+
         [Id(3)]
         public IMessage Message { get; }
 

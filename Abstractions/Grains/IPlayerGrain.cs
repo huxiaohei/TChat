@@ -1,12 +1,12 @@
 ﻿/*****************************************************************
- * Description 
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/28 18:09:58
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using Google.Protobuf;
 using Abstractions.Message;
+using Google.Protobuf;
 
 namespace Abstractions.Grains
 {
@@ -16,5 +16,4 @@ namespace Abstractions.Grains
         [Alias("ProcessMessage")]
         Task<(uint, IMessage?)> ProcessMessage([Immutable] SiloAddress siloAddress, [Immutable] long sessionId, [Immutable] ICSMessage message);
     }
-
 }

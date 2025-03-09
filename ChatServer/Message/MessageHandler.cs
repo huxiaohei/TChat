@@ -1,12 +1,12 @@
 ﻿/*****************************************************************
- * Description 
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 2024/12/2 23:14:49
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using Google.Protobuf;
 using Abstractions.Message;
+using Google.Protobuf;
 
 namespace ChatServer.Message
 {
@@ -46,11 +46,9 @@ namespace ChatServer.Message
             _siloAddress = siloAddress;
         }
 
-        virtual public Task<(uint, IMessage?)> HandleMessage(long sessionId, ICSMessage message)
+        public virtual Task<(uint, IMessage?)> HandleMessage(long sessionId, ICSMessage message)
         {
             throw new NotImplementedException("HandleMessage is not implemented.");
         }
-
     }
-
 }

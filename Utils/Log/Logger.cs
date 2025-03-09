@@ -1,5 +1,5 @@
 ﻿/*****************************************************************
- * Description 
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/23 15:50:47
  * Copyright (c) 2023 虎小黑
@@ -15,6 +15,5 @@ namespace Utils.Log
         public static Logger Network { get; } = LogManager.GetLogger("Network");
         public static Logger Chat { get; } = LogManager.GetLogger("Chat");
         public static Logger Player { get; } = LogManager.GetLogger("Player");
-
     }
 }

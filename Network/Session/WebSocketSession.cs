@@ -1,17 +1,17 @@
-/*****************************************************************
- * Description 
+﻿/*****************************************************************
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/23 11:29:31
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
+using Abstractions.Message;
+using Abstractions.Network;
+using Network.Message;
+using System.Net.WebSockets;
+using System.Threading.Channels;
 using Utils.Log;
 using Utils.Sequence;
-using System.Net.WebSockets;
-using Network.Message;
-using System.Threading.Channels;
-using Abstractions.Network;
-using Abstractions.Message;
 
 namespace Network.Session
 {
@@ -110,7 +110,6 @@ namespace Network.Session
                     }
                     try
                     {
-
                         if (RoleId == 0)
                         {
                             RoleId = msg.RoleId;
@@ -137,7 +136,5 @@ namespace Network.Session
                 Loggers.Network.Error($"SessionId:{SessionId} process message error:{e}");
             }
         }
-
-
     }
 }

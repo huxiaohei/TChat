@@ -1,17 +1,17 @@
 ﻿/*****************************************************************
- * Description 
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/23 11:17:09
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using Utils.Log;
-using Network.Session;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Channels;
 using Abstractions.Message;
 using Abstractions.Network;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Network.Session;
+using System.Threading.Channels;
+using Utils.Log;
 
 namespace Network.Controllers
 {
@@ -37,6 +37,5 @@ namespace Network.Controllers
                 HttpContext.Response.StatusCode = 400;
             }
         }
-
     }
 }

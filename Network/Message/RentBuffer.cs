@@ -1,5 +1,5 @@
 ﻿/*****************************************************************
- * Description 
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 2024/11/23 16:46:18
  * Copyright (c) 2023 虎小黑
@@ -25,7 +25,5 @@ namespace Network.Message
                 ArrayPool<byte>.Shared.Return(Buffer.Array);
             }
         }
-
     }
-
 }
