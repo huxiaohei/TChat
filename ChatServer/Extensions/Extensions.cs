@@ -56,17 +56,18 @@ namespace ChatServer.Extensions
             return false;
         }
 
-        public static async Task StartGrainServerAsync(this ServerBuilder builder)
+        public static async Task StartGrainServerAsync(this ServerBuilder builder, Action<IServiceCollection> services)
         {
             var siloHostBuild = Host.CreateDefaultBuilder()
                 .UseOrleans(silo =>
                 {
                     silo.AddGrainService<BaseGrainService>()
-                        .ConfigureServices(services =>
+                        .ConfigureServices(configureDelegate =>
                         {
-                            services.AddSingleton(builder.App.Services.GetRequiredService<ISessionManager>());
-                            services.AddSingleton(builder.App.Services.GetRequiredService<ILoggerFactory>());
-                            services.AddSingleton<IBaseGrainServiceClient, BaseGrainServiceClient>();
+                            configureDelegate.AddSingleton(builder.App.Services.GetRequiredService<ISessionManager>());
+                            configureDelegate.AddSingleton(builder.App.Services.GetRequiredService<ILoggerFactory>());
+                            configureDelegate.AddSingleton<IBaseGrainServiceClient, BaseGrainServiceClient>();
+                            services(configureDelegate);
                         })
                         .UseDashboard();
                     silo.Configure<ClusterOptions>(options =>
@@ -77,6 +78,7 @@ namespace ChatServer.Extensions
                     var siloConnectionAddr = EnvUtils.GetOrDefault("SiloConnection", "");
                     if (!string.IsNullOrEmpty(siloConnectionAddr))
                     {
+                        // TODO
                     }
                     else
                     {

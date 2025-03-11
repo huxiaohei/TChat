@@ -25,9 +25,13 @@ namespace ChatServer
 
             server.RegisterMessageHandler<ChatMessageHandler>();
 
+            server.AddSwaggerGen();
+
             server.Build();
 
-            await server.StartGrainServerAsync();
+            server.UseSwagger();
+
+            await server.StartGrainServerAsync(services => { });
 
             server.Run();
         }

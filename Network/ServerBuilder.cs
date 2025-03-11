@@ -9,11 +9,13 @@ using Abstractions.Message;
 using Abstractions.Network;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Network.Session;
-using System.Net;
+using System.Threading.Channels;
+using Utils.Log;
 
 namespace Network
 {
@@ -28,7 +30,7 @@ namespace Network
             {
                 if (_app == null)
                 {
-                    throw new Exception("Server is not built");
+                    throw new Exception("Server is not build");
                 }
                 return _app;
             }
@@ -42,6 +44,7 @@ namespace Network
         {
             _builder = WebApplication.CreateBuilder();
             _builder.Services.AddOptions();
+
             _builder.Services.AddLogging();
             _builder.Services.AddSingleton<ISessionManager, SessionManager>();
         }
@@ -60,8 +63,13 @@ namespace Network
         {
             _builder.WebHost.ConfigureKestrel((context, kesterl) =>
             {
-                kesterl.Listen(IPAddress.IPv6Any, port, configure);
+                kesterl.ListenAnyIP(port, configure);
             });
+        }
+
+        public void AddSwaggerGen()
+        {
+            _builder.Services.AddSwaggerGen();
         }
 
         public void Build()
@@ -70,16 +78,46 @@ namespace Network
             App = _builder.Build();
             App.UseWebSockets(new()
             {
-                KeepAliveInterval = TimeSpan.FromMinutes(1)
+                KeepAliveInterval = TimeSpan.FromMinutes(1),
             }).Use(async (context, next) =>
             {
-                await next(context);
+                if (context.Request.Path == "/ws")
+                {
+                    if (context.WebSockets.IsWebSocketRequest)
+                    {
+                        var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                        Loggers.Network.Info($"Receive a new WebSocket connection from {context.Connection.RemoteIpAddress}");
+
+                        var sessionManager = context.RequestServices.GetRequiredService<ISessionManager>();
+                        var handler = context.RequestServices.GetRequiredService<IMessageHandler>();
+                        var session = new WebSocketSession(sessionManager, handler, webSocket);
+                        sessionManager.AddSession(session);
+                        var channel = Channel.CreateBounded<ICSMessage>(20);
+                        await Task.WhenAll(session.ReceiveMessageAsync(channel.Writer), session.ProcessMessageAsync(channel.Reader));
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = 400;
+                        await context.Response.WriteAsync("Expected WebSocket request");
+                    }
+                }
+                else
+                {
+                    await next(context);
+                }
             });
-            App.MapControllers();
+        }
+
+        public void UseSwagger()
+        {
+            App.UseRouting();
+            App.UseSwagger();
+            App.UseSwaggerUI();
         }
 
         public void Run()
         {
+            App.MapControllers();
             App.Run();
         }
 

@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ServerBuilder.cs~RFab27a4b.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Protobuf Include="Protos\login.proto" GrpcServices="None" />
     <Protobuf Include="Protos\error.proto" GrpcServices="None" />
   </ItemGroup>
