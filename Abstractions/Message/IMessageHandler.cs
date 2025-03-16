@@ -13,6 +13,6 @@ namespace Abstractions.Message
     {
         void Bind(IClusterClient clusterClient, SiloAddress siloAddress);
 
-        Task<(uint, IMessage?)> HandleMessage(long sessionId, ICSMessage message);
+        Task<ISCMessage?> HandleMessage(long sessionId, ICSMessage message);
     }
 }

@@ -1,7 +1,8 @@
 ﻿using Network.Message;
 using Network.Protos;
 using System.Net.WebSockets;
-using Utils.Log;
+using Utils.LoggerUtil;
+using Utils.TimeUtil;
 
 namespace Tests.Login
 {
@@ -10,7 +11,9 @@ namespace Tests.Login
         [Fact]
         public async Task TestLogin()
         {
-            var req = new CSMessage(10001, 1, 1, new CSLoginReq()
+            uint clientSerialId = 0;
+            uint serverSerialId = 0;
+            var req = new CSMessage(10001, ++clientSerialId, ++serverSerialId, new CSLoginReq()
             {
                 Uid = 10001,
                 ServerId = 1001,
@@ -26,8 +29,13 @@ namespace Tests.Login
                 var result = await client.ReceiveAsync(buffer.Buffer, CancellationToken.None);
                 if (result.EndOfMessage)
                 {
-                    var msg = SCMessage.Decode(buffer.Buffer[..result.Count].ToArray());
+                    var msg = SCMessage.Decode([.. buffer.Buffer[..result.Count]]);
                     Loggers.Test.Info($"Receive message from Server, MsgName:{msg.MsgName} ClientSerialId:{msg.ClientSerialId} ServerSerialId:{msg.ServerSerialId} Message:{msg.Message}");
+
+                    var ping = new CSMessage(1001, ++clientSerialId, ++serverSerialId, new CSPing() { ClientTimeMs = Time.NowMilliseconds() });
+                    await client.SendAsync(ping.Encode(), WebSocketMessageType.Binary, true, CancellationToken.None);
+
+                    await Task.Delay(1000);
                 }
             }
         }

@@ -9,7 +9,7 @@ using Google.Protobuf;
 using Google.Protobuf.Reflection;
 
 using System.Reflection;
-using Utils.Log;
+using Utils.LoggerUtil;
 
 namespace Network.Extensions
 {

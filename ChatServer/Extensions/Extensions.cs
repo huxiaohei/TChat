@@ -7,8 +7,8 @@
 
 using NLog;
 using Network;
-using Utils.Log;
-using Utils.Envs;
+using Utils.LoggerUtil;
+using Utils.EnvUtil;
 using System.Diagnostics;
 using Orleans.Configuration;
 using ChatServer.Grains;

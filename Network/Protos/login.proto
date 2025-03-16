@@ -2,15 +2,28 @@ syntax = "proto3";
 
 package Network.Protos;
 
-message CSLoginReq {
-  int64 uid = 1;
-  int64 server_id = 2;
-  string token = 3;
+message CSLoginReq
+{
+    int64 uid = 1;
+    int64 server_id = 2;
+    string token = 3;
 }
 
-message CSReLoginReq {
-  int64 uid = 1;
-  int64 role_id = 2;
-  int64 server_id = 3;
-  string token = 4;
+message CSReLoginReq
+{
+    int64 uid = 1;
+    int64 role_id = 2;
+    int64 server_id = 3;
+    string token = 4;
+}
+
+message CSPing
+{
+    int64 client_time_ms = 1;
+}
+
+message SCPong
+{
+    int64 client_time_ms = 1;
+    int64 server_time_ms = 2;
 }

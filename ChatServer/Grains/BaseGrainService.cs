@@ -9,7 +9,7 @@ using Orleans.Concurrency;
 using Abstractions.Grains;
 using Abstractions.Message;
 using Abstractions.Network;
-using Utils.Log;
+using Utils.LoggerUtil;
 
 namespace ChatServer.Grains
 {

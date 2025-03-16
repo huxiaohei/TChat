@@ -5,7 +5,7 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-namespace Utils.Sequence
+namespace Utils.SequenceUtil
 {
     public static class MemoryUniqueSequence
     {

@@ -46,7 +46,7 @@ namespace ChatServer.Message
             _siloAddress = siloAddress;
         }
 
-        public virtual Task<(uint, IMessage?)> HandleMessage(long sessionId, ICSMessage message)
+        public virtual Task<ISCMessage?> HandleMessage(long sessionId, ICSMessage message)
         {
             throw new NotImplementedException("HandleMessage is not implemented.");
         }

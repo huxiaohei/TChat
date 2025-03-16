@@ -10,8 +10,8 @@ using Abstractions.Network;
 using Network.Message;
 using System.Net.WebSockets;
 using System.Threading.Channels;
-using Utils.Log;
-using Utils.Sequence;
+using Utils.LoggerUtil;
+using Utils.SequenceUtil;
 
 namespace Network.Session
 {
@@ -99,7 +99,7 @@ namespace Network.Session
         {
             try
             {
-                var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(1));
                 while (IsConnected || reader.Count > 0)
                 {
                     var msg = await reader.ReadAsync(cancellationToken.Token);
@@ -114,11 +114,10 @@ namespace Network.Session
                         {
                             RoleId = msg.RoleId;
                         }
-
-                        var (serverSerialId, resp) = await _handler.HandleMessage(SessionId, msg);
+                        var resp = await _handler.HandleMessage(SessionId, msg);
                         if (resp != null)
                         {
-                            await SendMessageAsync(new SCMessage(msg.ClientSerialId, serverSerialId, resp));
+                            await SendMessageAsync(resp);
                         }
                     }
                     catch (Exception e)

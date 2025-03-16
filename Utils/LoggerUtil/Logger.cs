@@ -7,13 +7,12 @@
 
 using NLog;
 
-namespace Utils.Log
+namespace Utils.LoggerUtil
 {
     public sealed class Loggers
     {
         public static Logger Test { get; } = LogManager.GetLogger("Test");
         public static Logger Network { get; } = LogManager.GetLogger("Network");
         public static Logger Chat { get; } = LogManager.GetLogger("Chat");
-        public static Logger Player { get; } = LogManager.GetLogger("Player");
     }
 }

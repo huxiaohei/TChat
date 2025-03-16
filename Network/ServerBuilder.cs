@@ -15,7 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Network.Session;
 using System.Threading.Channels;
-using Utils.Log;
+using Utils.EnvUtil;
+using Utils.LoggerUtil;
 
 namespace Network
 {
@@ -92,7 +93,8 @@ namespace Network
                         var handler = context.RequestServices.GetRequiredService<IMessageHandler>();
                         var session = new WebSocketSession(sessionManager, handler, webSocket);
                         sessionManager.AddSession(session);
-                        var channel = Channel.CreateBounded<ICSMessage>(20);
+                        var networkChannelCapacity = EnvUtils.GetOrDefault("", 20);
+                        var channel = Channel.CreateBounded<ICSMessage>(networkChannelCapacity);
                         await Task.WhenAll(session.ReceiveMessageAsync(channel.Writer), session.ProcessMessageAsync(channel.Reader));
                     }
                     else

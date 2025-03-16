@@ -7,7 +7,7 @@
 
 using Abstractions.Network;
 using System.Collections.Concurrent;
-using Utils.Log;
+using Utils.LoggerUtil;
 
 namespace Network.Session
 {
@@ -27,7 +27,10 @@ namespace Network.Session
 
         public void RemoveSession(long sessionId)
         {
-            _sessions.TryRemove(sessionId, out _);
+            if (_sessions.TryRemove(sessionId, out var _))
+            {
+                Loggers.Network.Info($"Session {sessionId} removed.");
+            }
         }
 
         public ISession? GetSession(long sessionId)

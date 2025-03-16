@@ -14,6 +14,6 @@ namespace Abstractions.Grains
     public interface IPlayerGrain : IGrainWithIntegerKey
     {
         [Alias("ProcessMessage")]
-        Task<(uint, IMessage?)> ProcessMessage([Immutable] SiloAddress siloAddress, [Immutable] long sessionId, [Immutable] ICSMessage message);
+        Task<ISCMessage?> ProcessMessage([Immutable] SiloAddress siloAddress, [Immutable] long sessionId, [Immutable] ICSMessage message);
     }
 }

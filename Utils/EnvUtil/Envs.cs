@@ -7,7 +7,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Utils.Envs
+namespace Utils.EnvUtil
 {
     public static class EnvUtils
     {
@@ -31,6 +31,16 @@ namespace Utils.Envs
                 return value;
             }
             return val;
+        }
+
+        public static T? GetOrDefault<T>(string key, T? value = default)
+        {
+            var val = Environment.GetEnvironmentVariable(key);
+            if (string.IsNullOrEmpty(val))
+            {
+                return value;
+            }
+            return (T)Convert.ChangeType(val, typeof(T));
         }
     }
 }

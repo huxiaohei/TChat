@@ -7,17 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="ServerBuilder.cs~RFab27a4b.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Protobuf Include="Protos\login.proto" GrpcServices="None" />
     <Protobuf Include="Protos\error.proto" GrpcServices="None" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.30.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.70.0">
+    <PackageReference Include="Grpc.Tools" Version="2.60.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
