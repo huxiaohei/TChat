@@ -58,11 +58,35 @@ namespace ChatServer.Grains
             }
             if (message.MsgName == "CSPing")
             {
-                return new SCMessage(message.ClientSerialId, ++_msgId, new SCPong() { ClientTimeMs = message.ClientSerialId, ServerTimeMs = Time.NowMilliseconds() });
+                // return new SCMessage(
+                //     RoleId,
+                //     message.ClientSerialId,
+                //     ++_msgId,
+                //     new SCPong()
+                //     {
+                //         ClientTimeMs = message.ClientSerialId,
+                //         ServerTimeMs = Time.NowMilliseconds()
+                //     });
+                await _client.SendMessageAsync(
+                    siloAddress,
+                    sessionId,
+                    new SCMessage(
+                        RoleId,
+                        message.ClientSerialId,
+                        ++_msgId,
+                        new SCPong()
+                        {
+                            ClientTimeMs = message.ClientSerialId,
+                            ServerTimeMs = Time.NowMilliseconds()
+                        }));
+                return default;
             }
-            // Loggers.Chat.Info($"PlayerGrain {RoleId} received message {message}");
-            // await _client.SendMessageAsync(siloAddress, sessionId, new SCMessage(0, 0, message.Message));
-            return new SCMessage(message.ClientSerialId, ++_msgId, ErrCode.Ok.Msg());
+            return new SCMessage(
+                RoleId,
+                message.ClientSerialId,
+                ++_msgId,
+                ErrCode.Ok.Msg()
+                );
         }
     }
 }

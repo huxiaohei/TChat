@@ -43,8 +43,11 @@ namespace Network.Session
 
         public async Task SendMessageAsync(ISCMessage message)
         {
-            await SendMessageAsync(message.Encode());
-            Loggers.Network.Info($"Send message to RoleId:{RoleId} MsgName:{message.MsgName} ClientSerialId:{message.ClientSerialId} ServerSerialId:{message.ServerSerialId} Message:{message.Message}");
+            if (IsConnected)
+            {
+                await SendMessageAsync(message.Encode());
+                Loggers.Network.Info($"Send message to RoleId:{message.RoleId} MsgName:{message.MsgName} ClientSerialId:{message.ClientSerialId} ServerSerialId:{message.ServerSerialId} Message:{message.Message}");
+            }
         }
 
         public async Task CloseAsync()

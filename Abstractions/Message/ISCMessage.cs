@@ -11,6 +11,7 @@ namespace Abstractions.Message
 {
     public interface ISCMessage
     {
+        long RoleId { get; }
         uint ClientSerialId { get; }
         uint ServerSerialId { get; }
         string MsgName { get; }

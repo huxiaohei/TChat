@@ -29,6 +29,7 @@ namespace ChatServer.Grains
             var session = _sessionManager.GetSession(sessionId);
             if (session != null)
             {
+                await Task.Delay(10000);
                 await session.SendMessageAsync(message);
             }
             else
