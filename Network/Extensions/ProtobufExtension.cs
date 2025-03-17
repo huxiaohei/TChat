@@ -7,7 +7,6 @@
 
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
-
 using System.Reflection;
 using Utils.LoggerUtil;
 
@@ -15,8 +14,8 @@ namespace Network.Extensions
 {
     public static class ProtobufExtension
     {
-        private static object _mutex = new object();
-        private static Dictionary<string, MessageParser> _parsers = new Dictionary<string, MessageParser>();
+        private static readonly object _mutex = new();
+        private static readonly Dictionary<string, MessageParser> _parsers = [];
 
         private static void LoadParseFromAssembly(Assembly ass)
         {
@@ -29,9 +28,7 @@ namespace Network.Extensions
                     continue;
                 try
                 {
-                    var parser = attrParser.GetValue("") as MessageParser;
-                    var parserDescriptor = attrDescriptor.GetValue("") as MessageDescriptor;
-                    if (parser == null || parserDescriptor == null)
+                    if (attrParser.GetValue("") is not MessageParser parser || attrDescriptor.GetValue("") is not MessageDescriptor parserDescriptor)
                         continue;
                     var name = parserDescriptor.Name;
                     _parsers.Add(string.Intern(name), parser);

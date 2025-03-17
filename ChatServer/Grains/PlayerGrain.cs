@@ -7,8 +7,7 @@
 
 using Abstractions.Grains;
 using Abstractions.Message;
-using ChatServer.Extensions;
-using Google.Protobuf;
+using Network.Extensions;
 using Network.Message;
 using Network.Protos;
 using Utils.LoggerUtil;
@@ -58,15 +57,6 @@ namespace ChatServer.Grains
             }
             if (message.MsgName == "CSPing")
             {
-                // return new SCMessage(
-                //     RoleId,
-                //     message.ClientSerialId,
-                //     ++_msgId,
-                //     new SCPong()
-                //     {
-                //         ClientTimeMs = message.ClientSerialId,
-                //         ServerTimeMs = Time.NowMilliseconds()
-                //     });
                 await _client.SendMessageAsync(
                     siloAddress,
                     sessionId,
@@ -85,8 +75,7 @@ namespace ChatServer.Grains
                 RoleId,
                 message.ClientSerialId,
                 ++_msgId,
-                ErrCode.Ok.Msg()
-                );
+                ErrCode.Ok.Msg());
         }
     }
 }

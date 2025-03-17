@@ -11,17 +11,11 @@ using Orleans.Runtime.Services;
 
 namespace ChatServer.Grains
 {
-    public class BaseGrainServiceClient : GrainServiceClient<IBaseGrainService>, IBaseGrainServiceClient
+    public class BaseGrainServiceClient(IServiceProvider provider, ILocalSiloDetails localSiloDetails)
+        : GrainServiceClient<IBaseGrainService>(provider), IBaseGrainServiceClient
     {
-        public IServiceProvider Provider { get; }
-        public SiloAddress SiloAddress { get; }
-
-        public BaseGrainServiceClient(IServiceProvider provider, ILocalSiloDetails localSiloDetails)
-            : base(provider)
-        {
-            Provider = provider;
-            SiloAddress = localSiloDetails.SiloAddress;
-        }
+        public IServiceProvider Provider { get; } = provider;
+        public SiloAddress SiloAddress { get; } = localSiloDetails.SiloAddress;
 
         public async Task SendMessageAsync(SiloAddress siloAddress, long sessionId, ISCMessage message)
         {

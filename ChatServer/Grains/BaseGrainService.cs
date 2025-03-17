@@ -14,15 +14,10 @@ using Utils.LoggerUtil;
 namespace ChatServer.Grains
 {
     [Reentrant]
-    public class BaseGrainService : GrainService, IBaseGrainService
+    public class BaseGrainService(GrainId grainId, Silo silo, ILoggerFactory loggerFactory, ISessionManager sessionManager)
+        : GrainService(grainId, silo, loggerFactory), IBaseGrainService
     {
-        private ISessionManager _sessionManager { get; }
-
-        public BaseGrainService(GrainId grainId, Silo silo, ILoggerFactory loggerFactory, ISessionManager sessionManager)
-            : base(grainId, silo, loggerFactory)
-        {
-            _sessionManager = sessionManager;
-        }
+        private readonly ISessionManager _sessionManager = sessionManager;
 
         public async Task SendMessageAsync(long sessionId, ISCMessage message)
         {

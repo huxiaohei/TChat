@@ -9,16 +9,11 @@ using System.Buffers;
 
 namespace Network.Message
 {
-    public struct RentBuffer : IDisposable
+    public struct RentBuffer(int size) : IDisposable
     {
-        public ArraySegment<byte> Buffer { get; private set; }
+        public ArraySegment<byte> Buffer { get; private set; } = new ArraySegment<byte>(ArrayPool<byte>.Shared.Rent(size), 0, size);
 
-        public RentBuffer(int size)
-        {
-            Buffer = new ArraySegment<byte>(ArrayPool<byte>.Shared.Rent(size), 0, size);
-        }
-
-        public void Dispose()
+        public readonly void Dispose()
         {
             if (Buffer.Array != null)
             {

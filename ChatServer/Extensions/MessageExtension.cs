@@ -7,25 +7,14 @@
 
 using Google.Protobuf;
 using Abstractions.Message;
-using Network.Protos;
 
 namespace ChatServer.Extensions
 {
     public static class MessageExtension
     {
-        public static IMessage Msg(this ErrCode code)
-        {
-            return new SCErrResp()
-            {
-                ErrCode = code,
-                ErrMsg = ""
-            };
-        }
-
         public static T Cast<T>(this ICSMessage message) where T : class, IMessage
         {
-            var result = message.Message as T;
-            if (result == null)
+            if (message.Message is not T result)
             {
                 throw new InvalidCastException("Failed to cast message to the specified type.");
             }

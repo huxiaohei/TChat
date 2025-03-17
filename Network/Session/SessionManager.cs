@@ -13,7 +13,7 @@ namespace Network.Session
 {
     public class SessionManager : ISessionManager
     {
-        private readonly ConcurrentDictionary<long, ISession> _sessions = new ConcurrentDictionary<long, ISession>();
+        private readonly ConcurrentDictionary<long, ISession> _sessions = new();
 
         public SessionManager()
         {

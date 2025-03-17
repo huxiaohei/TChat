@@ -15,21 +15,14 @@ using Utils.SequenceUtil;
 
 namespace Network.Session
 {
-    public class WebSocketSession : ISession
+    public class WebSocketSession(ISessionManager sessionManager, IMessageHandler handler, WebSocket webSocket)
+        : ISession
     {
-        public long SessionId { get; } = 0;
+        public long SessionId { get; } = MemoryUniqueSequence.Next();
         public long RoleId { get; set; } = 0;
-        private ISessionManager _sessionManager;
-        private WebSocket _webSocket;
-        private IMessageHandler _handler;
-
-        public WebSocketSession(ISessionManager sessionManager, IMessageHandler handler, WebSocket webSocket)
-        {
-            _sessionManager = sessionManager;
-            _handler = handler;
-            _webSocket = webSocket;
-            SessionId = MemoryUniqueSequence.Next();
-        }
+        private readonly ISessionManager _sessionManager = sessionManager;
+        private readonly WebSocket _webSocket = webSocket;
+        private readonly IMessageHandler _handler = handler;
 
         public bool IsConnected
         {

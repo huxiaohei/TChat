@@ -5,16 +5,20 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
+using Google.Protobuf;
 using Network.Protos;
 
 namespace Network.Extensions
 {
-
     public static class ErrExtension
     {
-        public static SCErrResp Msg(this ErrCode code)
+        public static IMessage Msg(this ErrCode code)
         {
-            return new SCErrResp() { ErrCode = code, ErrMsg = code.ToString() };
+            return new SCErrResp()
+            {
+                ErrCode = code,
+                ErrMsg = code.ToString()
+            };
         }
     }
 

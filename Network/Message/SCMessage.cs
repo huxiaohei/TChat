@@ -16,31 +16,22 @@ namespace Network.Message
     [Immutable]
     [GenerateSerializer]
     [Alias("Network.Message.SCMessage")]
-    public class SCMessage : ISCMessage
+    public class SCMessage(long roleId, uint clientSerialId, uint serverSerialId, IMessage message) : ISCMessage
     {
         [Id(0)]
-        public long RoleId { get; }
+        public long RoleId { get; } = roleId;
 
         [Id(1)]
-        public string MsgName { get; }
+        public string MsgName { get; } = message.Descriptor.Name;
 
         [Id(2)]
-        public uint ClientSerialId { get; }
+        public uint ClientSerialId { get; } = clientSerialId;
 
         [Id(3)]
-        public uint ServerSerialId { get; }
+        public uint ServerSerialId { get; } = serverSerialId;
 
         [Id(4)]
-        public IMessage Message { get; }
-
-        public SCMessage(long roleId, uint clientSerialId, uint serverSerialId, IMessage message)
-        {
-            RoleId = roleId;
-            MsgName = message.Descriptor.Name;
-            ClientSerialId = clientSerialId;
-            ServerSerialId = serverSerialId;
-            Message = message;
-        }
+        public IMessage Message { get; } = message;
 
         public static SCMessage Decode(byte[] bytes)
         {
@@ -49,11 +40,7 @@ namespace Network.Message
             var serverSerialId = BitConverter.ToUInt32(bytes, 12);
             var msgNameLength = BitConverter.ToInt32(bytes, 16);
             var msgName = Encoding.UTF8.GetString(bytes, 20, msgNameLength);
-            var message = bytes.DecodeMessage(msgName, 20 + msgNameLength);
-            if (message == null)
-            {
-                throw new Exception($"SCMessage Decode message error, Bytes:{bytes}");
-            }
+            var message = bytes.DecodeMessage(msgName, 20 + msgNameLength) ?? throw new Exception($"SCMessage Decode message error, Bytes:{bytes}");
             return new SCMessage(roleId, clientSerialId, serverSerialId, message);
         }
 

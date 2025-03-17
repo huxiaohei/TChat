@@ -6,7 +6,6 @@
  ****************************************************************/
 
 using Abstractions.Message;
-using Google.Protobuf;
 
 namespace ChatServer.Message
 {

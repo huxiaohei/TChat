@@ -15,31 +15,22 @@ namespace Network.Message
 {
     [Immutable]
     [GenerateSerializer]
-    public class CSMessage : ICSMessage
+    public class CSMessage(long roleId, uint clientSerialId, uint serverSerialId, IMessage message) : ICSMessage
     {
         [Id(0)]
-        public long RoleId { get; }
+        public long RoleId { get; } = roleId;
 
         [Id(1)]
-        public uint ClientSerialId { get; }
+        public uint ClientSerialId { get; } = clientSerialId;
 
         [Id(2)]
-        public uint ServerSerialId { get; }
+        public uint ServerSerialId { get; } = serverSerialId;
 
         [Id(3)]
-        public string MsgName { get; }
+        public string MsgName { get; } = message.Descriptor.Name;
 
         [Id(4)]
-        public IMessage Message { get; }
-
-        public CSMessage(long roleId, uint clientSerialId, uint serverSerialId, IMessage message)
-        {
-            RoleId = roleId;
-            ClientSerialId = clientSerialId;
-            ServerSerialId = serverSerialId;
-            MsgName = message.Descriptor.Name;
-            Message = message;
-        }
+        public IMessage Message { get; } = message;
 
         public byte[] Encode()
         {
