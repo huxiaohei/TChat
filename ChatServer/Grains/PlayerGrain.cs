@@ -7,11 +7,13 @@
 
 using Abstractions.Grains;
 using Abstractions.Message;
+using ChatServer.Extensions;
+using Google.Protobuf;
 using Network.Extensions;
 using Network.Message;
 using Network.Protos;
+using Utils.Container;
 using Utils.LoggerUtil;
-using Utils.TimeUtil;
 
 namespace ChatServer.Grains
 {
@@ -20,25 +22,48 @@ namespace ChatServer.Grains
         public readonly long RoleId;
         private readonly IBaseGrainServiceClient _client;
         private SiloAddress? _siloAddress;
-        private long _sessionId;
-        private uint _msgId;
 
+        private long _sessionId;
+        private uint _serverMsgSerialId = 0;
+        private uint _clientMsgSerialId = 0;
+
+        private readonly FixedQueue<ISCMessage> _cacheMessageQueue = new(100);
 
         public PlayerGrain(IGrainContext grainContext, IGrainRuntime grainRuntime, IBaseGrainServiceClient client)
             : base(grainContext, grainRuntime)
         {
             RoleId = this.GetPrimaryKeyLong();
             _client = client;
-            _msgId = 0;
+            _serverMsgSerialId = 0;
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             Loggers.Chat.Info($"PlayerGrain {RoleId} activated");
             await base.OnActivateAsync(cancellationToken);
+            // await LoadAsync();
         }
 
-        public async Task<ISCMessage?> ProcessMessage(SiloAddress siloAddress, long sessionId, ICSMessage message)
+        private void EnqueueCacheMessage(SCMessage resp)
+        {
+            if (resp.Message.GetType() == typeof(SCErrResp))
+            {
+                _cacheMessageQueue.Enqueue(resp);
+            }
+        }
+
+        public async Task SendMessageAsync(IMessage message)
+        {
+            if (_siloAddress == null)
+            {
+                return;
+            }
+            var msg = new SCMessage(RoleId, _clientMsgSerialId, ++_serverMsgSerialId, message);
+            EnqueueCacheMessage(msg);
+            await _client.SendMessageAsync(_siloAddress, _sessionId, msg);
+        }
+
+        public async Task<ISCMessage?> ProcessMessageAsync(SiloAddress siloAddress, long sessionId, ICSMessage message)
         {
             if (_siloAddress == null)
             {
@@ -55,27 +80,38 @@ namespace ChatServer.Grains
                 _siloAddress = siloAddress;
                 _sessionId = sessionId;
             }
-            if (message.MsgName == "CSPing")
+            if (message.ClientSerialId <= _clientMsgSerialId)
             {
-                await _client.SendMessageAsync(
-                    siloAddress,
-                    sessionId,
-                    new SCMessage(
-                        RoleId,
-                        message.ClientSerialId,
-                        ++_msgId,
-                        new SCPong()
-                        {
-                            ClientTimeMs = message.ClientSerialId,
-                            ServerTimeMs = Time.NowMilliseconds()
-                        }));
+                Loggers.Chat.Warn($"PlayerGrain {RoleId} received duplicate message {message.ClientSerialId}");
                 return default;
             }
-            return new SCMessage(
-                RoleId,
-                message.ClientSerialId,
-                ++_msgId,
-                ErrCode.Ok.Msg());
+
+            MessageExtension.InitMessageHandlers();
+            if (!MessageExtension.MessageHandlers.TryGetValue(message.Message.GetType(), out var handler))
+            {
+                Loggers.Chat.Warn($"PlayerGrain {RoleId} received unknown message {message.MsgName}");
+                return default;
+            }
+            try
+            {
+                var rst = await handler(this, message);
+                if (rst == null)
+                {
+                    return default;
+                }
+                var resp = new SCMessage(
+                        RoleId,
+                        message.ClientSerialId,
+                        ++_serverMsgSerialId,
+                        rst);
+                EnqueueCacheMessage(resp);
+                return resp;
+            }
+            catch (Exception ex)
+            {
+                Loggers.Chat.Error($"PlayerGrain process message:{message.MsgName} roleId:{RoleId} error:{ex}");
+                return ErrCode.InternalError.Msg(RoleId, message.ClientSerialId, ++_serverMsgSerialId);
+            }
         }
     }
 }

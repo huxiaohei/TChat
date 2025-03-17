@@ -7,7 +7,9 @@
 
 using Abstractions.Message;
 using Abstractions.Network;
+using Network.Extensions;
 using Network.Message;
+using Network.Protos;
 using System.Net.WebSockets;
 using System.Threading.Channels;
 using Utils.LoggerUtil;
@@ -18,11 +20,11 @@ namespace Network.Session
     public class WebSocketSession(ISessionManager sessionManager, IMessageHandler handler, WebSocket webSocket)
         : ISession
     {
-        public long SessionId { get; } = MemoryUniqueSequence.Next();
-        public long RoleId { get; set; } = 0;
         private readonly ISessionManager _sessionManager = sessionManager;
         private readonly WebSocket _webSocket = webSocket;
         private readonly IMessageHandler _handler = handler;
+        public long RoleId { get; set; } = 0;
+        public long SessionId { get; } = MemoryUniqueSequence.Next();
 
         public bool IsConnected
         {
@@ -109,8 +111,23 @@ namespace Network.Session
                         if (RoleId == 0)
                         {
                             RoleId = msg.RoleId;
+                            if (msg.Message.GetType() != typeof(CSLoginReq) && msg.Message.GetType() != typeof(CSReLoginReq))
+                            {
+                                await SendMessageAsync(ErrCode.FirstMsgNotLogin.Msg(RoleId, msg.ClientSerialId));
+                                await CloseAsync();
+                                Loggers.Network.Warn($"SessionId:{SessionId} RoleId:{RoleId} receive message from wrong RoleId:{msg.RoleId}");
+                                break;
+                            }
+                            // TODO: chech token
                         }
-                        var resp = await _handler.HandleMessage(SessionId, msg);
+                        if (RoleId != msg.RoleId)
+                        {
+                            await SendMessageAsync(ErrCode.InvalidParam.Msg(RoleId, msg.ClientSerialId));
+                            await CloseAsync();
+                            Loggers.Network.Warn($"SessionId:{SessionId} RoleId:{RoleId} receive message from wrong RoleId:{msg.RoleId}");
+                            break;
+                        }
+                        var resp = await _handler.HandleMessageAsync(SessionId, msg);
                         if (resp != null)
                         {
                             await SendMessageAsync(resp);

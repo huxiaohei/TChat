@@ -11,6 +11,6 @@ namespace Abstractions.Message
     {
         void Bind(IClusterClient clusterClient, SiloAddress siloAddress);
 
-        Task<ISCMessage?> HandleMessage(long sessionId, ICSMessage message);
+        Task<ISCMessage?> HandleMessageAsync(long sessionId, ICSMessage message);
     }
 }

@@ -6,6 +6,7 @@
  ****************************************************************/
 
 using Google.Protobuf;
+using Network.Message;
 using Network.Protos;
 
 namespace Network.Extensions
@@ -19,6 +20,11 @@ namespace Network.Extensions
                 ErrCode = code,
                 ErrMsg = code.ToString()
             };
+        }
+
+        public static SCMessage Msg(this ErrCode code, long roleId, uint clientMsgSerialId = 0, uint serverMsgSerialId = 0)
+        {
+            return new SCMessage(roleId, clientMsgSerialId, serverMsgSerialId, code.Msg());
         }
     }
 

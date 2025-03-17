@@ -12,9 +12,9 @@ namespace ChatServer.Message
 {
     public class ChatMessageHandler() : MessageHandler
     {
-        public override async Task<ISCMessage?> HandleMessage(long sessionId, ICSMessage message)
+        public override async Task<ISCMessage?> HandleMessageAsync(long sessionId, ICSMessage message)
         {
-            return await ClusterClient.GetGrain<IPlayerGrain>(message.RoleId).ProcessMessage(SiloAddress, sessionId, message);
+            return await ClusterClient.GetGrain<IPlayerGrain>(message.RoleId).ProcessMessageAsync(SiloAddress, sessionId, message);
         }
     }
 }

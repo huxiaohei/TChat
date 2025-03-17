@@ -15,8 +15,8 @@ namespace Abstractions.Grains
         IServiceProvider Provider { get; }
         SiloAddress SiloAddress { get; }
 
-        Task SendMessageAsync([Immutable] SiloAddress siloAddress, [Immutable] long sessionId, [Immutable] ISCMessage message);
+        Task SendMessageAsync([Immutable] SiloAddress siloAddress, long sessionId, [Immutable] ISCMessage message);
 
-        Task CloseSessionAsync([Immutable] SiloAddress siloAddress, [Immutable] long sessionId);
+        Task CloseSessionAsync([Immutable] SiloAddress siloAddress, long sessionId);
     }
 }

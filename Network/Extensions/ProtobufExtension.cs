@@ -22,15 +22,28 @@ namespace Network.Extensions
             var types = ass.GetTypes();
             foreach (var typeInfo in types)
             {
+                if (typeInfo.FullName == null)
+                {
+                    continue;
+                }
+                if (!typeInfo.FullName.StartsWith("Network.Protos") && !typeInfo.FullName.StartsWith("Google.Protobuf"))
+                {
+                    continue;
+                }
                 var attrParser = typeInfo.GetProperty("Parser");
                 var attrDescriptor = typeInfo.GetProperty("Descriptor");
                 if (attrParser == null || attrDescriptor == null)
+                {
                     continue;
+                }
                 try
                 {
                     if (attrParser.GetValue("") is not MessageParser parser || attrDescriptor.GetValue("") is not MessageDescriptor parserDescriptor)
+                    {
                         continue;
+                    }
                     var name = parserDescriptor.Name;
+                    Loggers.Network.Info($"-----fullName:{typeInfo.FullName} name:{name}");
                     _parsers.Add(string.Intern(name), parser);
                 }
                 catch (Exception e)
