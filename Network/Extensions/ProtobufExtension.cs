@@ -43,7 +43,6 @@ namespace Network.Extensions
                         continue;
                     }
                     var name = parserDescriptor.Name;
-                    Loggers.Network.Info($"-----fullName:{typeInfo.FullName} name:{name}");
                     _parsers.Add(string.Intern(name), parser);
                 }
                 catch (Exception e)

@@ -5,8 +5,10 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
+using System.Reflection;
 using Abstractions.Grains;
 using Abstractions.Message;
+using Abstractions.Module;
 using ChatServer.Extensions;
 using Google.Protobuf;
 using Network.Extensions;
@@ -27,7 +29,11 @@ namespace ChatServer.Grains
         private uint _serverMsgSerialId = 0;
         private uint _clientMsgSerialId = 0;
 
-        private readonly FixedQueue<ISCMessage> _cacheMessageQueue = new(100);
+        public readonly FixedQueue<ISCMessage> CacheMessageQueue = new(20);
+
+        #region 业务数据
+        private readonly Dictionary<Type, IBaseModule> _modules = [];
+        #endregion
 
         public PlayerGrain(IGrainContext grainContext, IGrainRuntime grainRuntime, IBaseGrainServiceClient client)
             : base(grainContext, grainRuntime)
@@ -41,15 +47,41 @@ namespace ChatServer.Grains
         {
             Loggers.Chat.Info($"PlayerGrain {RoleId} activated");
             await base.OnActivateAsync(cancellationToken);
-            // await LoadAsync();
+            await InitModuleAsync();
+        }
+
+        public override async Task OnDeactivateAsync(DeactivationReason reason, CancellationToken cancellationToken)
+        {
+            Loggers.Chat.Info($"PlayerGrain {RoleId} deactivated reason:{reason}");
+            await base.OnDeactivateAsync(reason, cancellationToken);
+        }
+
+        private async Task InitModuleAsync()
+        {
+            var moduleTypes = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.GetInterfaces().Contains(typeof(IBaseModule)))
+                .ToList();
+            foreach (var moduleType in moduleTypes)
+            {
+                var module = Activator.CreateInstance(moduleType, this) as IBaseModule
+                             ?? throw new InvalidOperationException($"Failed to create an instance of {moduleType.FullName}");
+                _modules.Add(moduleType, module);
+            }
+            await Task.WhenAll(_modules.Values.Select(m => m.InitAsync()));
+        }
+
+        public T? GetModule<T>() where T : IBaseModule
+        {
+            if (_modules.TryGetValue(typeof(T), out var module))
+            {
+                return (T)module;
+            }
+            return default;
         }
 
         private void EnqueueCacheMessage(SCMessage resp)
         {
-            if (resp.Message.GetType() == typeof(SCErrResp))
-            {
-                _cacheMessageQueue.Enqueue(resp);
-            }
+            CacheMessageQueue.Enqueue(resp);
         }
 
         public async Task SendMessageAsync(IMessage message)
@@ -62,6 +94,20 @@ namespace ChatServer.Grains
             EnqueueCacheMessage(msg);
             await _client.SendMessageAsync(_siloAddress, _sessionId, msg);
         }
+
+        public async Task SendMessageBatchAsync(IEnumerable<ISCMessage> messages, bool isCache = false)
+        {
+            if (_siloAddress == null)
+            {
+                return;
+            }
+            foreach (var message in messages)
+            {
+                message.IsCache = isCache;
+                await _client.SendMessageAsync(_siloAddress, _sessionId, message);
+            }
+        }
+
 
         public async Task<ISCMessage?> ProcessMessageAsync(SiloAddress siloAddress, long sessionId, ICSMessage message)
         {
@@ -80,11 +126,7 @@ namespace ChatServer.Grains
                 _siloAddress = siloAddress;
                 _sessionId = sessionId;
             }
-            if (message.ClientSerialId <= _clientMsgSerialId)
-            {
-                Loggers.Chat.Warn($"PlayerGrain {RoleId} received duplicate message {message.ClientSerialId}");
-                return default;
-            }
+            _clientMsgSerialId = Math.Max(message.ClientSerialId, _clientMsgSerialId);
 
             MessageExtension.InitMessageHandlers();
             if (!MessageExtension.MessageHandlers.TryGetValue(message.Message.GetType(), out var handler))

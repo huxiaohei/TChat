@@ -66,9 +66,6 @@ namespace ChatServer.Extensions
                             Loggers.Chat.Warn($"Method {method.Name} in {type.Name} has invalid return type.");
                             continue;
                         }
-
-                        Loggers.Chat.Info($"Method {method.Name} in {type.Name} has been added to message handlers.");
-
                         var handler = method.CreateDelegate<MessageHandler>();
                         MessageHandlers.Add(attribute.Msg, handler);
                         Loggers.Chat.Info($"Method {method.Name} in {type.Name} has been added to message handlers.");

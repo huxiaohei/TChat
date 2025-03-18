@@ -12,6 +12,7 @@ namespace Abstractions.Message
     public interface ISCMessage
     {
         long RoleId { get; }
+        bool IsCache { get; set; }
         uint ClientSerialId { get; }
         uint ServerSerialId { get; }
         string MsgName { get; }

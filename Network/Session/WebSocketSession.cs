@@ -82,6 +82,10 @@ namespace Network.Session
             {
                 Loggers.Network.Info($"SessionId:{SessionId} receive message timeout");
             }
+            catch (WebSocketException)
+            {
+                Loggers.Network.Info($"SessionId:{SessionId} receive message close");
+            }
             catch (Exception e)
             {
                 Loggers.Network.Error($"SessionId:{SessionId} receive message error:{e}");

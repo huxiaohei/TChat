@@ -9,7 +9,6 @@ using Abstractions.Message;
 using ChatServer.Extensions;
 using ChatServer.Grains;
 using Google.Protobuf;
-using Network.Extensions;
 using Network.Protos;
 using Utils.LoggerUtil;
 using Utils.TimeUtil;
@@ -18,13 +17,18 @@ namespace ChatServer.Modules.Login
 {
     public static class LoginHandler
     {
-
         [MessageCallback(typeof(CSLoginReq))]
         public static async Task<IMessage?> HandleLoginReq(this PlayerGrain playerGain, ICSMessage message)
         {
-            var msg = message.Cast<CSLoginReq>();
-            Loggers.Chat.Info($"PlayerGrain roleId:{playerGain.RoleId} login {msg.Uid} token:{msg.Token}");
-            return await Task.FromResult(ErrCode.Ok.Msg());
+            var _ = message.Cast<CSLoginReq>();
+            return await playerGain.GetModule<LoginModule>()!.LoginAsync();
+        }
+
+        [MessageCallback(typeof(CSReLoginReq))]
+        public static async Task<IMessage?> HandleReLoginReq(this PlayerGrain playerGain, ICSMessage message)
+        {
+            var _ = message.Cast<CSReLoginReq>();
+            return await playerGain.GetModule<LoginModule>()!.ReLoginAsync(message.ServerSerialId);
         }
 
         [MessageCallback(typeof(CSPing))]

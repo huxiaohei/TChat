@@ -9,6 +9,7 @@ enum ErrCode
     first_msg_not_login = 2;
     internal_error = 3;
     invalid_param = 4;
+    relogin_failed = 5;
 }
 
 message SCErrResp

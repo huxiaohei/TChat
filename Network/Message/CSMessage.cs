@@ -53,11 +53,7 @@ namespace Network.Message
             var serverSerialId = BitConverter.ToUInt32(bytes, 12);
             var msgNameLength = BitConverter.ToInt32(bytes, 16);
             var msgName = Encoding.UTF8.GetString(bytes, 20, msgNameLength);
-            var message = bytes.DecodeMessage(msgName, 20 + msgNameLength);
-            if (message == null)
-            {
-                throw new Exception($"CSMessage Decode message error, Bytes:{bytes}");
-            }
+            var message = bytes.DecodeMessage(msgName, 20 + msgNameLength) ?? throw new Exception($"CSMessage Decode message error, Bytes:{bytes}");
             return new CSMessage(roleId, clientSerialId, serverSerialId, message);
         }
     }
