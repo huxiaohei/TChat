@@ -6,7 +6,6 @@
  ****************************************************************/
 
 using ChatServer.Extensions;
-using ChatServer.Message;
 using Network;
 
 namespace ChatServer

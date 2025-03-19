@@ -6,6 +6,7 @@
  ****************************************************************/
 
 using System.Reflection;
+using System.Runtime.Loader;
 using Abstractions.Grains;
 using Abstractions.Message;
 using Abstractions.Module;
@@ -14,6 +15,7 @@ using Google.Protobuf;
 using Network.Extensions;
 using Network.Message;
 using Network.Protos;
+using NLog;
 using Utils.Container;
 using Utils.LoggerUtil;
 
@@ -32,7 +34,7 @@ namespace ChatServer.Grains
         public readonly FixedQueue<ISCMessage> CacheMessageQueue = new(20);
 
         #region 业务数据
-        private readonly Dictionary<Type, IBaseModule> _modules = [];
+        private readonly Dictionary<string, IBaseModule> _modules = [];
         #endregion
 
         public PlayerGrain(IGrainContext grainContext, IGrainRuntime grainRuntime, IBaseGrainServiceClient client)
@@ -63,34 +65,55 @@ namespace ChatServer.Grains
                 .ToList();
             foreach (var moduleType in moduleTypes)
             {
+                if (moduleType.FullName == null)
+                {
+                    continue;
+                }
+                Loggers.Chat.Info($"Init module -- {moduleType.FullName}");
                 var module = Activator.CreateInstance(moduleType, this) as IBaseModule
                              ?? throw new InvalidOperationException($"Failed to create an instance of {moduleType.FullName}");
-                _modules.Add(moduleType, module);
+                _modules.Add(moduleType.FullName, module);
             }
             await Task.WhenAll(_modules.Values.Select(m => m.InitAsync()));
         }
 
-        public async Task<bool> ReloadModuleAsync(string assemblyPath)
+        public async Task<bool> HotfixModuleAsync(string hotfixAssemblyPath)
         {
-            var assembly = string.IsNullOrEmpty(assemblyPath) ? Assembly.GetEntryAssembly() : Assembly.LoadFrom(assemblyPath);
-            if (assembly == null)
+            if (!File.Exists(hotfixAssemblyPath))
             {
-                Loggers.Chat.Error($"Failed to load assembly {assemblyPath}");
+                Loggers.Chat.Error($"Hotfix assembly not found {hotfixAssemblyPath}");
                 return false;
             }
+            var loadContext = new AssemblyLoadContext("HotfixReload", true);
+            loadContext.Resolving += (context, name) =>
+            {
+                var assemblyName = new AssemblyName(name.Name!);
+                var assemblyPath = Path.Combine(Path.GetDirectoryName(hotfixAssemblyPath)!, assemblyName.Name + ".dll");
+                if (File.Exists(assemblyPath))
+                {
+                    return context.LoadFromAssemblyPath(assemblyPath);
+                }
+                return null;
+            };
+            var assembly = loadContext.LoadFromAssemblyPath(hotfixAssemblyPath);
             var moduleTypes = assembly.GetTypes()
-                .Where(t => t.GetInterfaces().Contains(typeof(IBaseModule)))
+                .Where(t => t.GetInterfaces().Any(i => i.FullName == typeof(IBaseModule).FullName))
                 .ToList();
             foreach (var moduleType in moduleTypes)
             {
-                if (_modules.TryGetValue(moduleType, out var oldModule))
+                if (moduleType.FullName == null)
+                {
+                    continue;
+                }
+                Loggers.Chat.Info($"Reload module -- {moduleType.FullName}");
+                if (_modules.TryGetValue(moduleType.FullName, out var oldModule))
                 {
                     await oldModule.DestroyAsync();
-                    _modules.Remove(moduleType);
+                    _modules.Remove(moduleType.FullName);
                 }
                 var module = Activator.CreateInstance(moduleType, this) as IBaseModule
                              ?? throw new InvalidOperationException($"Failed to create an instance of {moduleType.FullName}");
-                _modules.Add(moduleType, module);
+                _modules.Add(moduleType.FullName, module);
             }
             await Task.WhenAll(_modules.Values.Select(m => m.InitAsync()));
             return true;
@@ -98,7 +121,7 @@ namespace ChatServer.Grains
 
         public T? GetModule<T>() where T : IBaseModule
         {
-            if (_modules.TryGetValue(typeof(T), out var module))
+            if (_modules.TryGetValue(typeof(T).FullName!, out var module))
             {
                 return (T)module;
             }

@@ -16,10 +16,10 @@ namespace Network.Controllers
     public class Hotfix : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> ReloadModuleAsync(long roleId)
+        public async Task<IActionResult> ReloadModuleAsync(long roleId, string hotfixAssemblyPath)
         {
             var factory = HttpContext.RequestServices.GetRequiredService<IGrainFactory>();
-            bool suc = await factory.GetGrain<IPlayerGrain>(roleId).ReloadModuleAsync("");
+            bool suc = await factory.GetGrain<IPlayerGrain>(roleId).HotfixModuleAsync(hotfixAssemblyPath);
             return suc ? Ok("Success") : BadRequest("Failed");
         }
     }
