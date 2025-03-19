@@ -14,5 +14,8 @@ namespace Abstractions.Grains
     {
         [Alias("ProcessMessage")]
         Task<ISCMessage?> ProcessMessageAsync([Immutable] SiloAddress siloAddress, long sessionId, [Immutable] ICSMessage message);
+
+        [Alias("ReloadModuleAsync")]
+        Task<bool> ReloadModuleAsync(string assemblyPath);
     }
 }

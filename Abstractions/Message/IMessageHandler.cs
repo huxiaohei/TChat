@@ -9,8 +9,6 @@ namespace Abstractions.Message
 {
     public interface IMessageHandler
     {
-        void Bind(IClusterClient clusterClient, SiloAddress siloAddress);
-
         Task<ISCMessage?> HandleMessageAsync(long sessionId, ICSMessage message);
     }
 }

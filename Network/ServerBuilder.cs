@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Network.Session;
@@ -23,42 +22,37 @@ namespace Network
 {
     public class ServerBuilder
     {
-        private WebApplicationBuilder _builder;
-        public WebApplication? _app { get; private set; }
+        private readonly WebApplicationBuilder _builder;
+        private WebApplication? App { get; set; }
 
-        public WebApplication App
+        public WebApplication Application
         {
             get
             {
-                if (_app == null)
+                if (App == null)
                 {
                     throw new Exception("Server is not build");
                 }
-                return _app;
+                return App;
             }
             private set
             {
-                _app = value;
+                App = value;
             }
         }
+
+        public IServiceCollection Services => _builder.Services;
 
         public ServerBuilder()
         {
             _builder = WebApplication.CreateBuilder();
             _builder.Services.AddOptions();
-
             _builder.Services.AddLogging();
-            _builder.Services.AddSingleton<ISessionManager, SessionManager>();
         }
 
         public void AddLogging(Action<ILoggingBuilder> configure)
         {
             _builder.Services.AddLogging(configure);
-        }
-
-        public void RegisterMessageHandler<T>() where T : class, IMessageHandler
-        {
-            _builder.Services.AddSingleton<IMessageHandler, T>();
         }
 
         public void ListenTcp(int port, Action<ListenOptions> configure)
@@ -77,8 +71,8 @@ namespace Network
         public void Build()
         {
             _builder.Services.AddControllers();
-            App = _builder.Build();
-            App.UseWebSockets(new()
+            Application = _builder.Build();
+            Application.UseWebSockets(new()
             {
                 KeepAliveInterval = TimeSpan.FromMinutes(1),
             }).Use(async (context, next) =>
@@ -113,20 +107,20 @@ namespace Network
 
         public void UseSwagger()
         {
-            App.UseRouting();
-            App.UseSwagger();
-            App.UseSwaggerUI();
+            Application.UseRouting();
+            Application.UseSwagger();
+            Application.UseSwaggerUI();
         }
 
         public void Run()
         {
-            App.MapControllers();
-            App.Run();
+            Application.MapControllers();
+            Application.Run();
         }
 
         public async void Stop()
         {
-            await App.StopAsync();
+            await Application.StopAsync();
         }
     }
 }

@@ -10,11 +10,11 @@ using Abstractions.Message;
 
 namespace ChatServer.Message
 {
-    public class ChatMessageHandler() : MessageHandler
+    public class ChatMessageHandler(IGrainFactory factory, SiloAddress siloAddress) : IMessageHandler
     {
-        public override async Task<ISCMessage?> HandleMessageAsync(long sessionId, ICSMessage message)
+        public async Task<ISCMessage?> HandleMessageAsync(long sessionId, ICSMessage message)
         {
-            return await ClusterClient.GetGrain<IPlayerGrain>(message.RoleId).ProcessMessageAsync(SiloAddress, sessionId, message);
+            return await factory.GetGrain<IPlayerGrain>(message.RoleId).ProcessMessageAsync(siloAddress, sessionId, message);
         }
     }
 }

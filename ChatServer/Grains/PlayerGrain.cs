@@ -70,6 +70,32 @@ namespace ChatServer.Grains
             await Task.WhenAll(_modules.Values.Select(m => m.InitAsync()));
         }
 
+        public async Task<bool> ReloadModuleAsync(string assemblyPath)
+        {
+            var assembly = string.IsNullOrEmpty(assemblyPath) ? Assembly.GetEntryAssembly() : Assembly.LoadFrom(assemblyPath);
+            if (assembly == null)
+            {
+                Loggers.Chat.Error($"Failed to load assembly {assemblyPath}");
+                return false;
+            }
+            var moduleTypes = assembly.GetTypes()
+                .Where(t => t.GetInterfaces().Contains(typeof(IBaseModule)))
+                .ToList();
+            foreach (var moduleType in moduleTypes)
+            {
+                if (_modules.TryGetValue(moduleType, out var oldModule))
+                {
+                    await oldModule.DestroyAsync();
+                    _modules.Remove(moduleType);
+                }
+                var module = Activator.CreateInstance(moduleType, this) as IBaseModule
+                             ?? throw new InvalidOperationException($"Failed to create an instance of {moduleType.FullName}");
+                _modules.Add(moduleType, module);
+            }
+            await Task.WhenAll(_modules.Values.Select(m => m.InitAsync()));
+            return true;
+        }
+
         public T? GetModule<T>() where T : IBaseModule
         {
             if (_modules.TryGetValue(typeof(T), out var module))

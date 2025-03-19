@@ -17,8 +17,7 @@ using Utils.SequenceUtil;
 
 namespace Network.Session
 {
-    public class WebSocketSession(ISessionManager sessionManager, IMessageHandler handler, WebSocket webSocket)
-        : ISession
+    public class WebSocketSession(ISessionManager sessionManager, IMessageHandler handler, WebSocket webSocket) : ISession
     {
         private readonly ISessionManager _sessionManager = sessionManager;
         private readonly WebSocket _webSocket = webSocket;

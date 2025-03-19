@@ -10,6 +10,7 @@ namespace Abstractions.Module
     public interface IBaseModule
     {
         Task InitAsync();
+        Task DestroyAsync();
     }
 
 }

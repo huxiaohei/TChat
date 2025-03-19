@@ -17,14 +17,13 @@ using Abstractions.Grains;
 using Abstractions.Network;
 using Abstractions.Message;
 using Microsoft.Extensions.Logging.Configuration;
+using Network.Session;
+using ChatServer.Message;
 
 namespace ChatServer.Extensions
 {
     public static class Extensions
     {
-        public static void AddDefaultServices(this ServerBuilder builder)
-        {
-        }
 
         public static void AddNLog(this ServerBuilder builder)
         {
@@ -64,8 +63,8 @@ namespace ChatServer.Extensions
                     silo.AddGrainService<BaseGrainService>()
                         .ConfigureServices(configureDelegate =>
                         {
-                            configureDelegate.AddSingleton(builder.App.Services.GetRequiredService<ISessionManager>());
-                            configureDelegate.AddSingleton(builder.App.Services.GetRequiredService<ILoggerFactory>());
+                            configureDelegate.AddSingleton<ISessionManager, SessionManager>();
+                            configureDelegate.AddSingleton<ILoggerFactory, LoggerFactory>();
                             configureDelegate.AddSingleton<IBaseGrainServiceClient, BaseGrainServiceClient>();
                             services(configureDelegate);
                         })
@@ -93,9 +92,13 @@ namespace ChatServer.Extensions
             await siloHost.StartAsync();
 
             var silo = siloHost.Services.GetRequiredService<Silo>();
-            var clusterClient = siloHost.Services.GetRequiredService<IClusterClient>();
-            var messageHandler = builder.App.Services.GetRequiredService<IMessageHandler>();
-            messageHandler.Bind(clusterClient, silo.SiloAddress);
+            var factory = siloHost.Services.GetRequiredService<IGrainFactory>();
+            var messageHandler = new ChatMessageHandler(factory, silo.SiloAddress);
+
+            builder.Services.AddSingleton(factory);
+            builder.Services.AddSingleton<IMessageHandler>(messageHandler);
+            builder.Services.AddSingleton(siloHost.Services.GetRequiredService<ISessionManager>());
+            builder.Services.AddSingleton(siloHost.Services.GetRequiredService<ILoggerFactory>());
         }
     }
 }

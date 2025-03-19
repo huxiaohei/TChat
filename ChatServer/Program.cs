@@ -17,21 +17,17 @@ namespace ChatServer
         {
             var server = new ServerBuilder();
 
-            server.AddDefaultServices();
-
             server.AddNLog();
 
             server.TryListenTcp();
 
-            server.RegisterMessageHandler<ChatMessageHandler>();
-
             server.AddSwaggerGen();
+
+            await server.StartGrainServerAsync(services => { });
 
             server.Build();
 
             server.UseSwagger();
-
-            await server.StartGrainServerAsync(services => { });
 
             server.Run();
         }

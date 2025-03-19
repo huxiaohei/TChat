@@ -21,6 +21,11 @@ namespace ChatServer.Modules.Login
             await Task.CompletedTask;
         }
 
+        public async Task DestroyAsync()
+        {
+            await Task.CompletedTask;
+        }
+
         public async Task<IMessage> LoginAsync()
         {
             await _grain.SendMessageAsync(new SCTodoResp()
