@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Utils.EnvUtil
 {
-    public static class EnvUtils
+    public static class Envs
     {
         public static bool TryGetEnv(string key, [MaybeNullWhen(false)] out string value)
         {

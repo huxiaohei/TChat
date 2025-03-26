@@ -88,7 +88,7 @@ namespace Network
                         var handler = context.RequestServices.GetRequiredService<IMessageHandler>();
                         var session = new WebSocketSession(sessionManager, handler, webSocket);
                         sessionManager.AddSession(session);
-                        var networkChannelCapacity = EnvUtils.GetOrDefault("", 20);
+                        var networkChannelCapacity = Envs.GetOrDefault("", 20);
                         var channel = Channel.CreateBounded<ICSMessage>(networkChannelCapacity);
                         await Task.WhenAll(session.ReceiveMessageAsync(channel.Writer), session.ProcessMessageAsync(channel.Reader));
                     }

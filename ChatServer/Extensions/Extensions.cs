@@ -28,7 +28,7 @@ namespace ChatServer.Extensions
         public static void AddNLog(this ServerBuilder builder)
         {
             var filePath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule!.FileName);
-            var name = EnvUtils.GetOrDefault("NLOG_CONFIG_NAME", "NLog.config");
+            var name = Envs.GetOrDefault("NLOG_CONFIG_NAME", "NLog.config");
             filePath = $"{filePath}/{name}";
             LogManager.LogFactory.Setup().LoadConfigurationFromFile(filePath);
 
@@ -44,7 +44,7 @@ namespace ChatServer.Extensions
 
         public static bool TryListenTcp(this ServerBuilder builder)
         {
-            if (EnvUtils.TryGetEnv("TcpPort", out var tcpPort))
+            if (Envs.TryGetEnv("TcpPort", out var tcpPort))
             {
                 builder.ListenTcp(int.Parse(tcpPort), options =>
                 {
@@ -74,7 +74,7 @@ namespace ChatServer.Extensions
                         options.ClusterId = "dev";
                         options.ServiceId = "TChat";
                     });
-                    var siloConnectionAddr = EnvUtils.GetOrDefault("SiloConnection", "");
+                    var siloConnectionAddr = Envs.GetOrDefault("SiloConnection", "");
                     if (!string.IsNullOrEmpty(siloConnectionAddr))
                     {
                         // TODO

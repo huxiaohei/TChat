@@ -15,7 +15,7 @@ namespace Tests.Login
         private void AddNLog()
         {
             var filePath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule!.FileName);
-            var name = EnvUtils.GetOrDefault("NLOG_CONFIG_NAME", "NLog.config");
+            var name = Envs.GetOrDefault("NLOG_CONFIG_NAME", "NLog.config");
             filePath = $"{filePath}/{name}";
             LogManager.LogFactory.Setup().LoadConfigurationFromFile(filePath);
         }

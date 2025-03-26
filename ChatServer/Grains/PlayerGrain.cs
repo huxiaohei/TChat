@@ -15,7 +15,6 @@ using Google.Protobuf;
 using Network.Extensions;
 using Network.Message;
 using Network.Protos;
-using NLog;
 using Utils.Container;
 using Utils.LoggerUtil;
 
@@ -77,46 +76,9 @@ namespace ChatServer.Grains
             await Task.WhenAll(_modules.Values.Select(m => m.InitAsync()));
         }
 
-        public async Task<bool> HotfixModuleAsync(string hotfixAssemblyPath)
+        public async Task<bool> HotfixModuleAsync(string scriptPath)
         {
-            if (!File.Exists(hotfixAssemblyPath))
-            {
-                Loggers.Chat.Error($"Hotfix assembly not found {hotfixAssemblyPath}");
-                return false;
-            }
-            var loadContext = new AssemblyLoadContext("HotfixReload", true);
-            loadContext.Resolving += (context, name) =>
-            {
-                var assemblyName = new AssemblyName(name.Name!);
-                var assemblyPath = Path.Combine(Path.GetDirectoryName(hotfixAssemblyPath)!, assemblyName.Name + ".dll");
-                if (File.Exists(assemblyPath))
-                {
-                    return context.LoadFromAssemblyPath(assemblyPath);
-                }
-                return null;
-            };
-            var assembly = loadContext.LoadFromAssemblyPath(hotfixAssemblyPath);
-            var moduleTypes = assembly.GetTypes()
-                .Where(t => t.GetInterfaces().Any(i => i.FullName == typeof(IBaseModule).FullName))
-                .ToList();
-            foreach (var moduleType in moduleTypes)
-            {
-                if (moduleType.FullName == null)
-                {
-                    continue;
-                }
-                Loggers.Chat.Info($"Reload module -- {moduleType.FullName}");
-                if (_modules.TryGetValue(moduleType.FullName, out var oldModule))
-                {
-                    await oldModule.DestroyAsync();
-                    _modules.Remove(moduleType.FullName);
-                }
-                var module = Activator.CreateInstance(moduleType, this) as IBaseModule
-                             ?? throw new InvalidOperationException($"Failed to create an instance of {moduleType.FullName}");
-                _modules.Add(moduleType.FullName, module);
-            }
-            await Task.WhenAll(_modules.Values.Select(m => m.InitAsync()));
-            return true;
+            return false;
         }
 
         public T? GetModule<T>() where T : IBaseModule
@@ -156,7 +118,6 @@ namespace ChatServer.Grains
                 await _client.SendMessageAsync(_siloAddress, _sessionId, message);
             }
         }
-
 
         public async Task<ISCMessage?> ProcessMessageAsync(SiloAddress siloAddress, long sessionId, ICSMessage message)
         {
