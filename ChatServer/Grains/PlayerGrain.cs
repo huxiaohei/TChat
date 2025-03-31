@@ -78,7 +78,30 @@ namespace ChatServer.Grains
 
         public async Task<bool> HotfixModuleAsync(string scriptPath)
         {
-            return false;
+            try
+            {
+                var module = await HotFixEngine.LoadModuleFromScriptAsync(scriptPath);
+                if (module == null)
+                {
+                    Loggers.Chat.Error($"PlayerGrain {RoleId} hotfix module failed");
+                    return false;
+                }
+                if (_modules.TryGetValue(module.GetType().FullName!, out var oldModule))
+                {
+                    _modules.Remove(module.GetType().FullName!);
+                    await oldModule.DestroyAsync();
+                }
+                _modules.Add(module.GetType().FullName!, module);
+                await module.InitAsync();
+                Loggers.Chat.Info($"PlayerGrain {RoleId} hotfix module {module.GetType().FullName} success");
+
+            }
+            catch (Exception ex)
+            {
+                Loggers.Chat.Error($"PlayerGrain {RoleId} hotfix module error:{ex.Message} stack:{ex.StackTrace}");
+                return false;
+            }
+            return true;
         }
 
         public T? GetModule<T>() where T : IBaseModule
@@ -117,6 +140,11 @@ namespace ChatServer.Grains
                 message.IsCache = isCache;
                 await _client.SendMessageAsync(_siloAddress, _sessionId, message);
             }
+        }
+
+        public async Task<bool> PingAsync()
+        {
+            return await Task.FromResult(true);
         }
 
         public async Task<ISCMessage?> ProcessMessageAsync(SiloAddress siloAddress, long sessionId, ICSMessage message)

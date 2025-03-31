@@ -12,7 +12,10 @@ namespace Abstractions.Grains
     [Alias("Abstractions.Grains.IPlayerGrain")]
     public interface IPlayerGrain : IGrainWithIntegerKey
     {
-        [Alias("ProcessMessage")]
+        [Alias("PingAsync")]
+        Task<bool> PingAsync();
+
+        [Alias("ProcessMessageAsync")]
         Task<ISCMessage?> ProcessMessageAsync([Immutable] SiloAddress siloAddress, long sessionId, [Immutable] ICSMessage message);
 
         [Alias("HotfixModuleAsync")]
