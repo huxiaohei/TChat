@@ -6,16 +6,14 @@
  ****************************************************************/
 
 using Google.Protobuf;
-using Abstractions.Message;
-using System.Reflection;
 using Utils.LoggerUtil;
-using Network.Message;
-using Abstractions.Grains;
+using System.Reflection;
 using ChatServer.Grains;
+using Abstractions.Message;
 
 namespace ChatServer.Extensions
 {
-
+    [AttributeUsage(AttributeTargets.Method)]
     public sealed class MessageCallbackAttribute(Type msg) : Attribute
     {
         public readonly Type Msg = msg;
@@ -24,7 +22,9 @@ namespace ChatServer.Extensions
     public static class MessageExtension
     {
         private static readonly object mutex = new();
+
         public delegate Task<IMessage?> MessageHandler(PlayerGrain player, ICSMessage message);
+
         public static readonly Dictionary<Type, MessageHandler> MessageHandlers = [];
 
         public static void InitMessageHandlers()

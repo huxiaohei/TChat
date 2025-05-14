@@ -1,13 +1,13 @@
-/*****************************************************************
- * Description 
+﻿/*****************************************************************
+ * Description
  * Email huxiaoheigame@gmail.com
  * Created on 3/18/2025, 11:06:49 AM
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using ChatServer.Grains;
 using Network.Protos;
 using Google.Protobuf;
+using ChatServer.Grains;
 using Abstractions.Module;
 
 namespace ChatServer.Modules.Login
@@ -63,5 +63,4 @@ namespace ChatServer.Modules.Login
             }
         }
     }
-
 }

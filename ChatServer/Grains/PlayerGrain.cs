@@ -5,18 +5,17 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
-using System.Reflection;
-using System.Runtime.Loader;
-using Abstractions.Grains;
-using Abstractions.Message;
-using Abstractions.Module;
-using ChatServer.Extensions;
-using Google.Protobuf;
-using Network.Extensions;
-using Network.Message;
 using Network.Protos;
+using Google.Protobuf;
+using Network.Message;
 using Utils.Container;
 using Utils.LoggerUtil;
+using System.Reflection;
+using Network.Extensions;
+using Abstractions.Grains;
+using Abstractions.Module;
+using Abstractions.Message;
+using ChatServer.Extensions;
 
 namespace ChatServer.Grains
 {
@@ -25,16 +24,16 @@ namespace ChatServer.Grains
         public readonly long RoleId;
         private readonly IBaseGrainServiceClient _client;
         private SiloAddress? _siloAddress;
-
         private long _sessionId;
         private uint _serverMsgSerialId = 0;
-        private uint _clientMsgSerialId = 0;
 
         public readonly FixedQueue<ISCMessage> CacheMessageQueue = new(20);
 
         #region 业务数据
+
         private readonly Dictionary<string, IBaseModule> _modules = [];
-        #endregion
+
+        #endregion 业务数据
 
         public PlayerGrain(IGrainContext grainContext, IGrainRuntime grainRuntime, IBaseGrainServiceClient client)
             : base(grainContext, grainRuntime)
@@ -94,7 +93,6 @@ namespace ChatServer.Grains
                 _modules.Add(module.GetType().FullName!, module);
                 await module.InitAsync();
                 Loggers.Chat.Info($"PlayerGrain {RoleId} hotfix module {module.GetType().FullName} success");
-
             }
             catch (Exception ex)
             {
@@ -120,11 +118,12 @@ namespace ChatServer.Grains
 
         public async Task SendMessageAsync(IMessage message)
         {
-            if (_siloAddress == null)
+            var msg = new SCMessage(RoleId, 0, ++_serverMsgSerialId, message);
+            if (_siloAddress == null || _sessionId == 0)
             {
+                Loggers.Network.Info($"Send message to RoleId:{msg.RoleId} MsgName:{msg.MsgName} ClientSerialId:{msg.ClientSerialId} ServerSerialId:{msg.ServerSerialId} Message:{msg.Message}");
                 return;
             }
-            var msg = new SCMessage(RoleId, _clientMsgSerialId, ++_serverMsgSerialId, message);
             EnqueueCacheMessage(msg);
             await _client.SendMessageAsync(_siloAddress, _sessionId, msg);
         }
@@ -158,13 +157,12 @@ namespace ChatServer.Grains
             {
                 if (siloAddress != _siloAddress || sessionId != _sessionId)
                 {
-                    Loggers.Chat.Error($"PlayerGrain {RoleId} received message from wrong session {siloAddress} {sessionId}");
+                    Loggers.Chat.Info($"PlayerGrain {RoleId} received message from wrong session {siloAddress} {sessionId}");
                     await _client.CloseSessionAsync(_siloAddress, _sessionId);
                 }
                 _siloAddress = siloAddress;
                 _sessionId = sessionId;
             }
-            _clientMsgSerialId = Math.Max(message.ClientSerialId, _clientMsgSerialId);
 
             MessageExtension.InitMessageHandlers();
             if (!MessageExtension.MessageHandlers.TryGetValue(message.Message.GetType(), out var handler))
@@ -190,7 +188,7 @@ namespace ChatServer.Grains
             catch (Exception ex)
             {
                 Loggers.Chat.Error($"PlayerGrain process message:{message.MsgName} roleId:{RoleId} error:{ex}");
-                return ErrCode.InternalError.Msg(RoleId, message.ClientSerialId, ++_serverMsgSerialId);
+                return ErrCode.InternalError.Msg(RoleId, message.ClientSerialId);
             }
         }
     }

@@ -15,6 +15,7 @@ namespace Network.Message
 {
     [Immutable]
     [GenerateSerializer]
+    [Alias("Network.Message.CSMessage")]
     public class CSMessage(long roleId, uint clientSerialId, uint serverSerialId, IMessage message) : ICSMessage
     {
         [Id(0)]

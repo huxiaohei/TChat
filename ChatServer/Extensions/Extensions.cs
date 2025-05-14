@@ -24,7 +24,6 @@ namespace ChatServer.Extensions
 {
     public static class Extensions
     {
-
         public static void AddNLog(this ServerBuilder builder)
         {
             var filePath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule!.FileName);
@@ -32,11 +31,11 @@ namespace ChatServer.Extensions
             filePath = $"{filePath}/{name}";
             LogManager.LogFactory.Setup().LoadConfigurationFromFile(filePath);
 
-            builder.AddLogging(builder =>
+            builder.AddLogging(loggingBuilder =>
             {
-                builder.ClearProviders();
-                builder.AddConfiguration();
-                builder.AddNLog();
+                loggingBuilder.ClearProviders();
+                loggingBuilder.AddConfiguration();
+                loggingBuilder.AddNLog();
             });
 
             Loggers.Chat.Info("AddNLog NLog is ready.");
@@ -61,12 +60,12 @@ namespace ChatServer.Extensions
                 .UseOrleans(silo =>
                 {
                     silo.AddGrainService<BaseGrainService>()
-                        .ConfigureServices(configureDelegate =>
+                        .ConfigureServices(configure =>
                         {
-                            configureDelegate.AddSingleton<ISessionManager, SessionManager>();
-                            configureDelegate.AddSingleton<ILoggerFactory, LoggerFactory>();
-                            configureDelegate.AddSingleton<IBaseGrainServiceClient, BaseGrainServiceClient>();
-                            services(configureDelegate);
+                            configure.AddSingleton<ISessionManager, SessionManager>();
+                            configure.AddSingleton<ILoggerFactory, LoggerFactory>();
+                            configure.AddSingleton<IBaseGrainServiceClient, BaseGrainServiceClient>();
+                            services(configure);
                         })
                         .UseDashboard();
                     silo.Configure<ClusterOptions>(options =>

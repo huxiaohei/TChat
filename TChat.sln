@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Network", "Network\Network.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{3138B210-C8C9-40E0-98A4-B40F2A9AD722}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{170D7CEB-124A-4685-A65F-B76D869C63F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{7DFBC212-BC18-4032-BE9E-190A12AAE078}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,12 +35,15 @@ Global
 		{3138B210-C8C9-40E0-98A4-B40F2A9AD722}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3138B210-C8C9-40E0-98A4-B40F2A9AD722}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3138B210-C8C9-40E0-98A4-B40F2A9AD722}.Release|Any CPU.Build.0 = Release|Any CPU
-		{170D7CEB-124A-4685-A65F-B76D869C63F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{170D7CEB-124A-4685-A65F-B76D869C63F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{170D7CEB-124A-4685-A65F-B76D869C63F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{170D7CEB-124A-4685-A65F-B76D869C63F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DFBC212-BC18-4032-BE9E-190A12AAE078}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DFBC212-BC18-4032-BE9E-190A12AAE078}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DFBC212-BC18-4032-BE9E-190A12AAE078}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DFBC212-BC18-4032-BE9E-190A12AAE078}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3718D593-D06C-44CE-97E7-972F9187D2B0}
 	EndGlobalSection
 EndGlobal

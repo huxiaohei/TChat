@@ -82,13 +82,13 @@ namespace Network
                     if (context.WebSockets.IsWebSocketRequest)
                     {
                         var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                        Loggers.Network.Info($"Receive a new WebSocket connection from {context.Connection.RemoteIpAddress}");
+                        Loggers.Network.Info($"Receive a new WebSocket connection from address:{context.Connection.RemoteIpAddress}");
 
                         var sessionManager = context.RequestServices.GetRequiredService<ISessionManager>();
                         var handler = context.RequestServices.GetRequiredService<IMessageHandler>();
                         var session = new WebSocketSession(sessionManager, handler, webSocket);
                         sessionManager.AddSession(session);
-                        var networkChannelCapacity = Envs.GetOrDefault("", 20);
+                        var networkChannelCapacity = Envs.GetOrDefault("NetworkChannelCapacity", 20);
                         var channel = Channel.CreateBounded<ICSMessage>(networkChannelCapacity);
                         await Task.WhenAll(session.ReceiveMessageAsync(channel.Writer), session.ProcessMessageAsync(channel.Reader));
                     }

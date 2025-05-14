@@ -5,11 +5,11 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
+using Utils.LoggerUtil;
 using Orleans.Concurrency;
 using Abstractions.Grains;
 using Abstractions.Message;
 using Abstractions.Network;
-using Utils.LoggerUtil;
 
 namespace ChatServer.Grains
 {
@@ -39,10 +39,6 @@ namespace ChatServer.Grains
             {
                 await session.CloseAsync();
                 _sessionManager.RemoveSession(sessionId);
-            }
-            else
-            {
-                Loggers.Chat.Info($"Session {sessionId} not found");
             }
         }
     }

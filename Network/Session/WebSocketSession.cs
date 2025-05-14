@@ -71,7 +71,7 @@ namespace Network.Session
                     }
                     if (receiveResult.Count > 0)
                     {
-                        var msg = CSMessage.Decode(buffer.Buffer[..receiveResult.Count].ToArray());
+                        var msg = CSMessage.Decode([.. buffer.Buffer[..receiveResult.Count]]);
                         Loggers.Network.Info($"Receive message from RoleId:{msg.RoleId} MsgName:{msg.MsgName} ClientSerialId:{msg.ClientSerialId} ServerSerialId:{msg.ServerSerialId} Message:{msg.Message}");
                         writer.TryWrite(msg);
                     }
