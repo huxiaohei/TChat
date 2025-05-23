@@ -19,26 +19,22 @@ using ChatServer.Extensions;
 
 namespace ChatServer.Grains
 {
-    public class PlayerGrain : Grain, IPlayerGrain
+    public class PlayerGrain : Grain, IPlayerGrain, IPlayer
     {
-        public readonly long RoleId;
-        private readonly IBaseGrainServiceClient _client;
+        private readonly long PrimaryKey;
         private SiloAddress? _siloAddress;
         private long _sessionId;
         private uint _serverMsgSerialId = 0;
-
-        public readonly FixedQueue<ISCMessage> CacheMessageQueue = new(20);
-
-        #region 业务数据
-
+        private readonly IBaseGrainServiceClient _client;
+        private readonly FixedQueue<ISCMessage> CacheMessageQueue = new(20);
         private readonly Dictionary<string, IBaseModule> _modules = [];
 
-        #endregion 业务数据
+        public long RoleId => PrimaryKey;
 
         public PlayerGrain(IGrainContext grainContext, IGrainRuntime grainRuntime, IBaseGrainServiceClient client)
             : base(grainContext, grainRuntime)
         {
-            RoleId = this.GetPrimaryKeyLong();
+            PrimaryKey = this.GetPrimaryKeyLong();
             _client = client;
             _serverMsgSerialId = 0;
         }
@@ -58,7 +54,7 @@ namespace ChatServer.Grains
 
         private async Task InitModuleAsync()
         {
-            var moduleTypes = Assembly.GetExecutingAssembly().GetTypes()
+            var moduleTypes = Assembly.LoadFrom("./bin/Debug/net8.0/Modules11.dll").GetTypes()
                 .Where(t => t.GetInterfaces().Contains(typeof(IBaseModule)))
                 .ToList();
             foreach (var moduleType in moduleTypes)
@@ -79,20 +75,23 @@ namespace ChatServer.Grains
         {
             try
             {
-                var module = await HotFixEngine.LoadModuleFromScriptAsync(scriptPath);
-                if (module == null)
+                Loggers.Chat.Info($"hotfix path {scriptPath}");
+                var moduleTypes = Assembly.LoadFrom(scriptPath).GetTypes()
+                    .Where(t => t.GetInterfaces().Contains(typeof(IBaseModule)))
+                    .ToList();
+                foreach (var moduleType in moduleTypes)
                 {
-                    Loggers.Chat.Error($"PlayerGrain {RoleId} hotfix module failed");
-                    return false;
+                    var module = Activator.CreateInstance(moduleType, this) as IBaseModule
+                                 ?? throw new InvalidOperationException($"Failed to create an instance of {moduleType.FullName}");
+                    if (_modules.TryGetValue(module.GetType().FullName!, out var oldModule))
+                    {
+                        _modules.Remove(module.GetType().FullName!);
+                        await oldModule.DestroyAsync();
+                    }
+                    _modules.Add(module.GetType().FullName!, module);
+                    await module.InitAsync();
+                    Loggers.Chat.Info($"PlayerGrain {RoleId} hotfix module {module.GetType().FullName} success");
                 }
-                if (_modules.TryGetValue(module.GetType().FullName!, out var oldModule))
-                {
-                    _modules.Remove(module.GetType().FullName!);
-                    await oldModule.DestroyAsync();
-                }
-                _modules.Add(module.GetType().FullName!, module);
-                await module.InitAsync();
-                Loggers.Chat.Info($"PlayerGrain {RoleId} hotfix module {module.GetType().FullName} success");
             }
             catch (Exception ex)
             {
@@ -119,12 +118,12 @@ namespace ChatServer.Grains
         public async Task SendMessageAsync(IMessage message)
         {
             var msg = new SCMessage(RoleId, 0, ++_serverMsgSerialId, message);
+            EnqueueCacheMessage(msg);
             if (_siloAddress == null || _sessionId == 0)
             {
-                Loggers.Network.Info($"Send message to RoleId:{msg.RoleId} MsgName:{msg.MsgName} ClientSerialId:{msg.ClientSerialId} ServerSerialId:{msg.ServerSerialId} Message:{msg.Message}");
+                Loggers.Chat.Info($"Send message to RoleId:{msg.RoleId} MsgName:{msg.MsgName} ClientSerialId:{msg.ClientSerialId} ServerSerialId:{msg.ServerSerialId} Message:{msg.Message}");
                 return;
             }
-            EnqueueCacheMessage(msg);
             await _client.SendMessageAsync(_siloAddress, _sessionId, msg);
         }
 
@@ -164,8 +163,8 @@ namespace ChatServer.Grains
                 _sessionId = sessionId;
             }
 
-            MessageExtension.InitMessageHandlers();
-            if (!MessageExtension.MessageHandlers.TryGetValue(message.Message.GetType(), out var handler))
+            ProtobufExtension.InitMessageHandlers();
+            if (!ProtobufExtension.MessageHandlers.TryGetValue(message.Message.GetType(), out var handler))
             {
                 Loggers.Chat.Warn($"PlayerGrain {RoleId} received unknown message {message.MsgName}");
                 return default;

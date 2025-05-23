@@ -5,6 +5,7 @@
  * Copyright (c) 2023 虎小黑
  ****************************************************************/
 
+using Abstractions.Module;
 using Abstractions.Message;
 
 namespace Abstractions.Grains
